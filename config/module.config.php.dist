@@ -1,6 +1,6 @@
 <?php
 
-use AliChry\Authorization\Factory\AuthenticationServiceFactory;
+use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
 use AliChry\Laminas\AccessControl\AccessControlList as ACL;
 use AliChry\Laminas\AccessControl\Factory\AccessControlListFactory;
 use AliChry\Laminas\Authorization\AuthorizationLink;
