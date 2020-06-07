@@ -25,7 +25,7 @@
  * Time: 12:33
  */
 
-namespace AliChry\Authorization\Factory;
+namespace AliChry\Laminas\Authorization\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
