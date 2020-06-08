@@ -31,6 +31,7 @@ use Laminas\EventManager\EventInterface;
 use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\Mvc\Application;
 use Laminas\Mvc\MvcEvent;
+use Laminas\Mvc\Controller\AbstractController;
 
 class Module implements BootstrapListenerInterface
 {
