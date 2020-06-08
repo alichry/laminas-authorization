@@ -30,6 +30,7 @@ namespace AliChry\Laminas\Authorization;
 use Laminas\EventManager\EventInterface;
 use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\Mvc\Application;
+use Laminas\Mvc\MvcEvent;
 
 class Module implements BootstrapListenerInterface
 {
