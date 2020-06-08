@@ -91,7 +91,7 @@ class AuthorizationChainFactory implements FactoryInterface
                         array_merge(
                             $linkOptions,
                             [
-                                AuthorizationLink::OPTION_NAME => $linkName
+                                AuthorizationLinkFactory::OPTION_NAME => $linkName
                             ]
                         )
                     )

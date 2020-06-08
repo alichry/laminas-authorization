@@ -27,6 +27,8 @@
 
 namespace AliChry\Laminas\Authorization\Factory;
 
+use AliChry\Laminas\Authorization\AuthorizationService;
+use AliChry\Laminas\Authorization\AuthorizationChain;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Laminas\Config\Config;

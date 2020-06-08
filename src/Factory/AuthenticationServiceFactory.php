@@ -31,6 +31,7 @@ use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Laminas\Authentication\AuthenticationService;
 use Laminas\Authentication\Storage\Session;
+use Laminas\Session\SessionManager;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;

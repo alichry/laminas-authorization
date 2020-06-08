@@ -40,7 +40,7 @@ class AuthorizationLinkFactory implements FactoryInterface
     const OPTION_NAME = 'name';
     const OPTION_AUTH_SERVICE = 'authentication_service';
     const OPTION_ACCESS_CONTROL = 'access_control';
-    const OPTION_REDIRECT_ROUTE = 'redirect-route';
+    const OPTION_REDIRECT_ROUTE = 'redirect_route';
 
     /**
      * Create an object
