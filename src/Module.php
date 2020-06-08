@@ -36,6 +36,11 @@ class Module implements BootstrapListenerInterface
 {
     const DISPATCH_PRIORITY = 100;
 
+    public function getConfig()
+    {
+        return include __DIR__ . '/../config/module.config.php';
+    }
+
     /**
      * Listen to the bootstrap event
      *
