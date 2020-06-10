@@ -189,6 +189,9 @@ return [
 ];
 ```
 
+## How to help ?
+It would be nice to star this repository. It would help attracting more contributors, and makes me happy to receive a star ! :)
+
 ## TODO
 - Allow different response behaviors other than simply redirecting the user to a different route, possibly dropping a json response
 - Provide authorization plugin for controllers.
