@@ -2,21 +2,17 @@
 
 use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
 use AliChry\Laminas\AccessControl\AccessControlList as ACL;
-use AliChry\Laminas\AccessControl\Factory\AccessControlListFactory;
-use AliChry\Laminas\Authorization\AuthorizationLink;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use Laminas\Authentication\AuthenticationService;
 
 return [
     'service_manager' => [
         'factories' => [
-            ACL::class => AccessControlListFactory::class,
+            // Register your AuthenticationService to our Factory or yours:
             AuthenticationService::class => AuthenticationServiceFactory::class,
-            // The Auth adapter that implements AuthenticationAdapterInterface
-            // from laminas/laminas-authentication
-            YourAuthAdapter::class => YourAuthAdapterFactory::class,
-            AuthorizationLink::class => AuthenticationLinkFactory::class,
-            AuthorizationChain::class => AuthenticationChainFactory::class,
+            // Register yourAuth adapter(s) that implements
+            // AuthenticationAdapterInterface from laminas/laminas-authentication
+            YourAuthAdapter::class => YourAuthAdapterFactory::class
         ],
     ],
     'authorization' => [
