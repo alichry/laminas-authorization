@@ -101,7 +101,7 @@ In the configuration, the `chain` key should correspond to an associative array 
 
 The `authentication_service` option should either provide a service name (usually a FQCN such as `AuthenticationService::class`) or an array that will additionally allow providing custom build options to the AuthenticationServiceFactory. If you have your own factory for the Authentication Service that does not rely on build option, you can use the former which is preferrable. Otherwise, if you don't have a factory for the standard AuthenticationService from `laminas/authentication` or your registered factory requires build options, you need to provide build options under `options`. `authentication_service` is an array, consequently, there should exists 2 keys under it:
 
-- Service name: `service_name` -- typically a FQCN
+- Service name: `service` -- typically a FQCN
 - Build options: `options` -- an array of options that are passed to the factory. For our provided AuthenticationServiceFactory options, see the sample configuration or inspect the factory [AuthenticationServiceFactory](https://github.com/alichry/laminas-authorization/blob/master/src/Factory/AuthenticationServiceFactory.php#L41).
 
 The `redirect_route` option specifies the route to use when redirecting an unauthorized user. This is typically the login route. Currently, there is no option to specify route options, only a literal route, but future milestones should mention that feature.  
