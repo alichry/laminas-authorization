@@ -17,7 +17,7 @@ In other words, if you reference any session container name, make sure to refere
 # config/autoload/global.php
 <?php
 return [
-	...
+    ...
     'session_containers' => [
         'LoginAuth'
     ],
@@ -54,10 +54,10 @@ To setup this module, you need register `AliChry\Laminas\AccessControl` and `Ali
 # config/modules.config.php
 <?php
 return [
-	...
-   'AliChry\Laminas\AccessControl',
-   'AliChry\Laminas\Authorization',
-	...
+    ...
+    'AliChry\Laminas\AccessControl',
+    'AliChry\Laminas\Authorization',
+    ...
 ];
 ```
 
@@ -74,7 +74,7 @@ use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
 use Laminas\Authentication\AuthenticationService;
 
 return [
-	'service_manager' => [
+    'service_manager' => [
         'factories' => [
             // Your auth adapter that implements AuthenticationAdapter
             // from laminas/authentication
@@ -104,7 +104,6 @@ The `authentication_service` option should either provide a service name (usuall
 - Service name: `service_name` -- typically a FQCN
 - Build options: `options` -- an array of options that are passed to the factory. For our provided AuthenticationServiceFactory options, see the sample configuration or inspect the factory [AuthenticationServiceFactory](https://github.com/alichry/laminas-authorization/blob/master/src/Factory/AuthenticationServiceFactory.php#L41).
 
-
 The `redirect_route` option specifies the route to use when redirecting an unauthorized user. This is typically the login route. Currently, there is no option to specify route options, only a literal route, but future milestones should mention that feature.  
 
 The `access_control` option is conceptually similar to `authentication_service` option. We need to specify which `ListAdapterInterface` to use and pass any build option if it is required. The Access Control module, from `alichry/laminas-accesscontrol`, provides a factory that builds an `AccessControlList` by relying on passed build options. 
@@ -120,73 +119,73 @@ use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\AccessControl\AccessControlList as ACL;
 
 return [
-	// ...
-	'authorization' => [
-		'operator' => AuthorizationChain::OPERATOR_OR,
-		'chain' => [
-			// link name: global
-			'global' => [
-				'redirect_route' => 'login',
-				'authentication_service' => [
-					'service' => AuthenticationService::class,
-					'options' => [
-						'session' => 'session',
-						'session_container' => 'LoginAuth',
-						'adapter' => YourAuthenticationAdapter::class
-					]
-				]
-				'access_control' => [
-					'service' => ACL::class,
-					'options' => [
-						'mode' => ACL::MODE_STRICT,
-						'policy' => ACL::POLICY_REJECT,
-						'controllers' => [
-							YourController::class => ACL::ACCESS_ALL,
-							YourAuthenticatedController::class =>
-								ACL::ACCESS_AUTHENTICATED_ONLY,
-							YourRejectedController::class => ACL::ACCESS_REJECT_ALL,
-							AdminRoleController::class => ACL::role('admin'),
-							AdminPermController::class => ACL::permission('admin'),
-							YourMultipleAccessController::class => [
-								// actions
-								'public' => ACL::ACCESS_ALL,
-								'authenticated' => ACL::ACCESS_AUTHENTICATED_ONLY,
-								'rejectAll' => ACL::ACCESS_REJECT_ALL,
-								'adminRole' => ACL::role('admin'),
-								'adminPerm' => ACL::perm('admin-perm'),
-								'specialPerm' => ACL::permission('special')
-							]
-						],
-						'identities' => [
-							'user1@test.com' => [
-								'roles' => [
- 									'admin'
-								],
-								'permissions' => [
- 									'special-perm'
-								]
-							],
-							'user2@test.com' => [
-								'permissions' => [
- 									'admin-perm'
-								]
-							]
-						],
-						'roles' => [
-							'admin' => [
-								'admin-perm'
-							]
-						],
-						'permissions' => [
-							'admin-perm',
-							'special-perm'
-						]
-					]
-				]
-			]
-		]
-	]
-	// ...
+    // ...
+    'authorization' => [
+        'operator' => AuthorizationChain::OPERATOR_OR,
+        'chain' => [
+            // link name: global
+            'global' => [
+                'redirect_route' => 'login',
+                'authentication_service' => [
+                    'service' => AuthenticationService::class,
+                    'options' => [
+                        'session' => 'session',
+                        'session_container' => 'LoginAuth',
+                        'adapter' => YourAuthenticationAdapter::class
+                    ]
+                ]
+                'access_control' => [
+                    'service' => ACL::class,
+                    'options' => [
+                        'mode' => ACL::MODE_STRICT,
+                        'policy' => ACL::POLICY_REJECT,
+                        'controllers' => [
+                            YourController::class => ACL::ACCESS_ALL,
+                            YourAuthenticatedController::class =>
+                                ACL::ACCESS_AUTHENTICATED_ONLY,
+                            YourRejectedController::class => ACL::ACCESS_REJECT_ALL,
+                            AdminRoleController::class => ACL::role('admin'),
+                            AdminPermController::class => ACL::permission('admin'),
+                            YourMultipleAccessController::class => [
+                                // actions
+                                'public' => ACL::ACCESS_ALL,
+                                'authenticated' => ACL::ACCESS_AUTHENTICATED_ONLY,
+                                'rejectAll' => ACL::ACCESS_REJECT_ALL,
+                                'adminRole' => ACL::role('admin'),
+                                'adminPerm' => ACL::perm('admin-perm'),
+                                'specialPerm' => ACL::permission('special')
+                            ]
+                        ],
+                        'identities' => [
+                            'user1@test.com' => [
+                                'roles' => [
+                                     'admin'
+                                ],
+                                'permissions' => [
+                                     'special-perm'
+                                ]
+                            ],
+                            'user2@test.com' => [
+                                'permissions' => [
+                                     'admin-perm'
+                                ]
+                            ]
+                        ],
+                        'roles' => [
+                            'admin' => [
+                                'admin-perm'
+                            ]
+                        ],
+                        'permissions' => [
+                            'admin-perm',
+                            'special-perm'
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ]
+    // ...
 ];
 ```
 
