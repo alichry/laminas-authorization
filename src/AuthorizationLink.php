@@ -27,7 +27,7 @@
 
 namespace AliChry\Laminas\Authorization;
 
-use AliChry\Laminas\AccessControl\ListAdapterInterface;
+use AliChry\Laminas\AccessControl\AccessControlListInterface;
 use AliChry\Laminas\AccessControl\Status;
 use Laminas\Authentication\AuthenticationServiceInterface;
 
@@ -44,9 +44,9 @@ class AuthorizationLink
     private $authenticationService;
 
     /**
-     * @var ListAdapterInterface
+     * @var AccessControlListInterface
      */
-    private $listAdapter;
+    private $accessControlList;
 
     /**
      * @var null|string
@@ -57,19 +57,19 @@ class AuthorizationLink
      * AuthorizationLink constructor.
      * @param string $name
      * @param AuthenticationServiceInterface $authenticationService
-     * @param ListAdapterInterface $listAdapter
+     * @param AccessControlListInterface $list
      * @param string|null $redirectRoute
      */
     public function __construct(
         string $name,
         AuthenticationServiceInterface $authenticationService,
-        ListAdapterInterface $listAdapter,
+        AccessControlListInterface $list,
         ?string $redirectRoute = null
     )
     {
         $this->setName($name);
         $this->setAuthenticationService($authenticationService);
-        $this->setListAdapter($listAdapter);
+        $this->setAccessControlList($list);
         $this->setRedirectRoute($redirectRoute);
     }
 
@@ -108,21 +108,21 @@ class AuthorizationLink
     }
 
     /**
-     * @return ListAdapterInterface
+     * @return AccessControlListInterface
      */
-    public function getListAdapter(): ListAdapterInterface
+    public function getAccessControlList(): AccessControlListInterface
     {
-        return $this->listAdapter;
+        return $this->accessControlList;
     }
 
     /**
-     * @param ListAdapterInterface $listAdapter
+     * @param AccessControlListInterface $accessControlList
      */
-    public function setListAdapter(
-        ListAdapterInterface $listAdapter
+    public function setAccessControlList(
+        AccessControlListInterface $accessControlList
     ): void
     {
-        $this->listAdapter = $listAdapter;
+        $this->accessControlList = $accessControlList;
     }
 
     /**
@@ -158,7 +158,7 @@ class AuthorizationLink
     public function isAuthorized($controller, $action): AuthorizationResult
     {
         // TODO: pass/use $this->options in AuthorizationResult
-        $accessStatus = $this->listAdapter->getAccessStatus(
+        $accessStatus = $this->accessControlList->getAccessStatus(
             $this->authenticationService->getIdentity(),
             $controller,
             $action
@@ -166,20 +166,13 @@ class AuthorizationLink
         $code = $accessStatus->getCode();
         switch ($code) {
             case Status::PUBLIC:
-                return new AuthorizationResult(
-                    $accessStatus,
-                    $this
-                );
             case Status::REJECTED:
-                return new AuthorizationResult(
-                    $accessStatus,
-                    $this
-                );
             case Status::UNAUTHORIZED:
                 return new AuthorizationResult(
                     $accessStatus,
                     $this
                 );
+                break;
             case Status::OK:
                 $authenticated = $this->isAuthenticated();
                 return new AuthorizationResult(
@@ -187,6 +180,7 @@ class AuthorizationLink
                     $this,
                     $authenticated
                 );
+                break;
             default:
                 throw new AuthorizationException(
                     sprintf(

@@ -27,7 +27,7 @@ return [
 
 ## Authorization Link
 An Authorization Link is built around entities that can infer whether an (authenticated) identity is authorized to access a controller or a controller's action.  
-This is achieved by relying on `AuthenticationService` (for authentication status) and  a `ListAdapterInterface` from `alichry/laminas-accesscontrol` (currently only `AccessControlList`) that defines a list of propertities that dictates the roles, permissions and the accessibility or authorization level of each controller or controller's action.
+This is achieved by relying on `AuthenticationService` (for authentication status) and  a `AccessControlListInterface` from `alichry/laminas-accesscontrol` (currently only `ArrayAccessControlList`) that defines a list of propertities that dictates the roles, permissions and the accessibility or authorization level of each controller or controller's action.
 Eventually, an Authorization Link can imply whether an (authenticated) identity is granted access to a certain resource (controller/action) and will return the result.
 
 ## Authorization Chain
@@ -45,7 +45,7 @@ ACL configuration defines a list of controller/action entries that can indicate 
 - Authenticated only
 - A defined role or a permission the referenced identity must be granted to 
 
-Static functions provided by `AccessControlList` can aid in building your configuration and ensures compatibility with future versions. See [alichry/laminas-accesscontrol](https://github.com/alichry/laminas-accesscontrol)
+Static functions provided by `ArrayAccessControlList` can aid in building your configuration and ensures compatibility with future versions. See [alichry/laminas-accesscontrol](https://github.com/alichry/laminas-accesscontrol)
 
 ## Configuration
 To setup this module, you need register `AliChry\Laminas\AccessControl` and `AliChry\Laminas\Authorization` in `config/modules.config.php`
@@ -106,7 +106,7 @@ The `authentication_service` option should either provide a service name (usuall
 
 The `redirect_route` option specifies the route to use when redirecting an unauthorized user. This is typically the login route. Currently, there is no option to specify route options, only a literal route, but future milestones should mention that feature.  
 
-The `access_control` option is conceptually similar to `authentication_service` option. We need to specify which `ListAdapterInterface` to use and pass any build option if it is required. The Access Control module, from `alichry/laminas-accesscontrol`, provides a factory that builds an `AccessControlList` by relying on passed build options. 
+The `access_control` option is conceptually similar to `authentication_service` option. We need to specify which `AccessControlListInterface` to use and pass any build option if it is required. The Access Control module, from `alichry/laminas-accesscontrol`, provides a factory that builds an `ArrayAccessControlList` by relying on passed build options. 
 
 A sample authorization configuration would be (from config/module.config.php.dist):
 
@@ -116,7 +116,7 @@ A sample authorization configuration would be (from config/module.config.php.dis
 
 use Laminas\Authentication\AuthenticationService;
 use AliChry\Laminas\Authorization\AuthorizationChain;
-use AliChry\Laminas\AccessControl\AccessControlList as ACL;
+use AliChry\Laminas\AccessControl\ArrayAccessControlList as ACL;
 
 return [
     // ...

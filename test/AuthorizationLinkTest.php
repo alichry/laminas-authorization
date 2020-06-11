@@ -28,7 +28,7 @@ declare(strict_types=1);
 
 namespace AliChry\Laminas\Authorization\Test;
 
-use AliChry\Laminas\AccessControl\ListAdapterInterface;
+use AliChry\Laminas\AccessControl\AccessControlListInterface;
 use AliChry\Laminas\AccessControl\Status;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
@@ -46,7 +46,7 @@ class AuthorizationLinkTest extends TestCase
         $link = new AuthorizationLink(
             $constructorName,
             $this->mockAuthService(),
-            $this->mockListAdapter()
+            $this->mockAccessControlList()
         );
 
         $this->assertEquals(
@@ -68,7 +68,7 @@ class AuthorizationLinkTest extends TestCase
         $link = new AuthorizationLink(
             '',
             $constructorService,
-            $this->mockListAdapter()
+            $this->mockAccessControlList()
         );
 
         $this->assertSame(
@@ -84,10 +84,10 @@ class AuthorizationLinkTest extends TestCase
         );
     }
 
-    public function testListAdapter()
+    public function testAccessControlList()
     {
-        $constructorAdapter = $this->mockListAdapter();
-        $setterAdapter = $this->mockListAdapter();
+        $constructorAdapter = $this->mockAccessControlList();
+        $setterAdapter = $this->mockAccessControlList();
         $link = new AuthorizationLink(
             '',
             $this->mockAuthService(),
@@ -96,13 +96,13 @@ class AuthorizationLinkTest extends TestCase
 
         $this->assertSame(
             $constructorAdapter,
-            $link->getListAdapter()
+            $link->getAccessControlList()
         );
 
-        $link->setListAdapter($setterAdapter);
+        $link->setAccessControlList($setterAdapter);
         $this->assertSame(
             $setterAdapter,
-            $link->getListAdapter()
+            $link->getAccessControlList()
         );
     }
 
@@ -113,7 +113,7 @@ class AuthorizationLinkTest extends TestCase
         $link = new AuthorizationLink(
             '',
             $this->mockAuthService(),
-            $this->mockListAdapter(),
+            $this->mockAccessControlList(),
             $constructorRoute
         );
 
@@ -139,7 +139,7 @@ class AuthorizationLinkTest extends TestCase
         $link = new AuthorizationLink(
             '',
             $serviceMock,
-            $this->mockListAdapter()
+            $this->mockAccessControlList()
         );
 
         $this->assertSame(
@@ -179,7 +179,7 @@ class AuthorizationLinkTest extends TestCase
     {
         $expectingException = is_array($expected);
         $mockService = $this->mockAuthService();
-        $mockList = $this->mockListAdapter();
+        $mockList = $this->mockAccessControlList();
         $mockAccessStatus = $this->createMock(Status::class);
 
         $link = new AuthorizationLink(
@@ -323,8 +323,8 @@ class AuthorizationLinkTest extends TestCase
     /**
      * @return MockObject
      */
-    private function mockListAdapter()
+    private function mockAccessControlList()
     {
-        return $this->createMock(ListAdapterInterface::class);
+        return $this->createMock(AccessControlListInterface::class);
     }
 }

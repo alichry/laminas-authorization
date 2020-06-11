@@ -16,7 +16,7 @@
         "laminas/laminas-authentication": "^2.7",
         "laminas/laminas-servicemanager": "^3.4",
         "laminas/laminas-mvc": "^3.1",
-        "alichry/laminas-accesscontrol": "dev-master",
+        "alichry/laminas-accesscontrol": "^1.0.0",
         "laminas/laminas-session": "^2.9"
     },
     "autoload": {

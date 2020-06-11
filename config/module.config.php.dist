@@ -1,7 +1,7 @@
 <?php
 
 use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
-use AliChry\Laminas\AccessControl\AccessControlList as ACL;
+use AliChry\Laminas\AccessControl\ArrayAccessControlList as ACL;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use Laminas\Authentication\AuthenticationService;
 
@@ -51,19 +51,19 @@ return [
                 // like:
                 //'access_control' => ACL::class,
                 // otherwise, you can use provided ACL factory,
-                // AccessControlListFactory, that accepts the list as
+                // ArrayAccessControlListFactory, that accepts the list as
                 // factory options.
                 'access_control' => [
                     'service' => ACL::class,
                     'options' => [
                         'mode' => ACL::MODE_STRICT,
                         // or
-                        //'mode' => AccessControlList::MODE_CHILL,
+                        //'mode' => ACL::MODE_CHILL,
                         'policy' => ACL::POLICY_REJECT,
                         // or
-                        //'policy' => AccessControlList::POLICY_AUTENTICATE,
+                        //'policy' => ACL::POLICY_AUTENTICATE,
                         // or
-                        //'policy' => AccessControlList::POLICY_ACCEPT,
+                        //'policy' => ACL::POLICY_ACCEPT,
                         'controllers' => [
                             YourController::class => ACL::ACCESS_ALL,
                             YourAuthenticatedController::class =>
