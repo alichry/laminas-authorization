@@ -2,6 +2,7 @@
 
 use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
 use AliChry\Laminas\AccessControl\ArrayAccessControlList as ACL;
+use AliChry\Laminas\AccessControl\Lists\ArrayListAdapter as LA;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use Laminas\Authentication\AuthenticationService;
 
@@ -56,9 +57,9 @@ return [
                 'access_control' => [
                     'service' => ACL::class,
                     'options' => [
-                        'mode' => ACL::MODE_STRICT,
+                        'mode' => LA::MODE_STRICT,
                         // or
-                        //'mode' => ACL::MODE_CHILL,
+                        //'mode' => LA::MODE_CHILL,
                         'policy' => ACL::POLICY_REJECT,
                         // or
                         //'policy' => ACL::POLICY_AUTENTICATE,
@@ -77,7 +78,7 @@ return [
                                 'authenticated' => ACL::ACCESS_AUTHENTICATED_ONLY,
                                 'rejectAll' => ACL::ACCESS_REJECT_ALL,
                                 'adminRole' => ACL::role('admin'),
-                                'adminPerm' => ACL::perm('admin-perm'),
+                                'adminPerm' => ACL::permission('admin-perm'),
                                 'specialPerm' => ACL::permission('special')
                             ]
                         ],
