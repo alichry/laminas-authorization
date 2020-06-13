@@ -27,6 +27,7 @@
 
 namespace AliChry\Laminas\Authorization;
 
+use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\AccessControl\AccessControlListInterface;
 use AliChry\Laminas\AccessControl\Status;
 use Laminas\Authentication\AuthenticationServiceInterface;
@@ -153,7 +154,7 @@ class AuthorizationLink
      * @param $controller
      * @param $action
      * @return AuthorizationResult
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized($controller, $action): AuthorizationResult
     {
@@ -168,6 +169,7 @@ class AuthorizationLink
             case Status::PUBLIC:
             case Status::REJECTED:
             case Status::UNAUTHORIZED:
+            case Status::UNAUTHENTICATED: // if passed identity is null
                 return new AuthorizationResult(
                     $accessStatus,
                     $this

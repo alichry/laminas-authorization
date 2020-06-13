@@ -27,6 +27,8 @@
 
 namespace AliChry\Laminas\Authorization;
 
+use AliChry\Laminas\AccessControl\AccessControlException;
+
 class AuthorizationChain implements AuthorizationChainInterface
 {
     // binary operator
@@ -142,7 +144,7 @@ class AuthorizationChain implements AuthorizationChainInterface
      * @param string $controllerName
      * @param null|string $action
      * @return AuthorizationResult
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized(string $controllerName, ?string $action = null)
     : AuthorizationResult

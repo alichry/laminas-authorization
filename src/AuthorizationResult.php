@@ -205,9 +205,8 @@ class AuthorizationResult
     private static function validateCode($code): bool
     {
         switch ($code) {
-            case self::RESULT_ALLOWED:
-                return true;
             case self::RESULT_REJECTED:
+            case self::RESULT_ALLOWED:
                 return true;
             default:
                 return false;

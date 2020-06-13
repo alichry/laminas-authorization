@@ -27,6 +27,7 @@
 
 namespace AliChry\Laminas\Authorization;
 
+use AliChry\Laminas\AccessControl\AccessControlException;
 use Laminas\Authentication\AuthenticationServiceInterface;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\Controller\Plugin\Redirect;
@@ -93,7 +94,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @param MvcEvent $event
      * @return null|ResponseInterface
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function onDispatch(MvcEvent $event): ?ResponseInterface
     {
@@ -137,7 +138,7 @@ class AuthorizationService implements AuthorizationServiceInterface
      * @param null $controller
      * @param null $action
      * @return AuthorizationResult
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized(
         $controller = null,
@@ -160,7 +161,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @param null|AuthorizationResult $authResult
      * @return null|ResponseInterface
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function getMvcResult(
         ?AuthorizationResult $authResult = null

@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace AliChry\Laminas\Authorization\Test;
 
+use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\AccessControl\AccessControlListInterface;
 use AliChry\Laminas\AccessControl\Status;
 use AliChry\Laminas\Authorization\AuthorizationException;
@@ -167,7 +168,7 @@ class AuthorizationLinkTest extends TestCase
      * @param $action
      * @param $code
      * @param $expected
-     * @throws AuthorizationException
+     * @throws AuthorizationException|AccessControlException
      */
     public function testIsAuthorized(
         $identity,
@@ -267,6 +268,7 @@ class AuthorizationLinkTest extends TestCase
         ];
         $validStatusCodes = [
             Status::UNAUTHORIZED,
+            STATUS::UNAUTHENTICATED,
             Status::REJECTED,
             Status::PUBLIC,
             Status::OK
@@ -275,6 +277,7 @@ class AuthorizationLinkTest extends TestCase
             Status::CODE_MAX + 1,
             Status::CODE_MIN - 1,
             Status::UNAUTHORIZED,
+            Status::UNAUTHENTICATED,
             Status::REJECTED,
             Status::PUBLIC,
             Status::OK
