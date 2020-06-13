@@ -131,7 +131,9 @@ class AuthorizationService implements AuthorizationServiceInterface
         }
         $this->controller = $controllerName;
         $this->action = $action;
-        return $this->getMvcResult();
+        $result = $this->getMvcResult();
+        $event->setResult($result);
+        return $result;
     }
 
     /**
@@ -164,7 +166,7 @@ class AuthorizationService implements AuthorizationServiceInterface
      * @throws AuthorizationException|AccessControlException
      */
     public function getMvcResult(
-        ?AuthorizationResult $authResult = null
+        AuthorizationResult $authResult = null
     ): ?ResponseInterface
     {
         if (null === $authResult) {
