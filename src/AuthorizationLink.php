@@ -30,6 +30,7 @@ namespace AliChry\Laminas\Authorization;
 use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\AccessControl\AccessControlListInterface;
 use AliChry\Laminas\AccessControl\Status;
+use AliChry\Laminas\Authorization\Resource\LinkAwareResourceIdentifier;
 use Laminas\Authentication\AuthenticationServiceInterface;
 
 class AuthorizationLink
@@ -161,8 +162,11 @@ class AuthorizationLink
         // TODO: pass/use $this->options in AuthorizationResult
         $accessStatus = $this->accessControlList->getAccessStatus(
             $this->authenticationService->getIdentity(),
-            $controller,
-            $action
+            new LinkAwareResourceIdentifier(
+                $this->name,
+                $controller,
+                $action
+            )
         );
         $code = $accessStatus->getCode();
         switch ($code) {

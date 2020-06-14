@@ -30,9 +30,11 @@ namespace AliChry\Laminas\Authorization\Test;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\AccessControl\AccessControlListInterface;
+use AliChry\Laminas\AccessControl\Resource\ResourceIdentifierInterface;
 use AliChry\Laminas\AccessControl\Status;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
+use AliChry\Laminas\Authorization\Resource\LinkAwareResourceIdentifier;
 use Laminas\Authentication\AuthenticationServiceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -184,7 +186,7 @@ class AuthorizationLinkTest extends TestCase
         $mockAccessStatus = $this->createMock(Status::class);
 
         $link = new AuthorizationLink(
-            '',
+            'sweet-link',
             $mockService,
             $mockList
         );
@@ -207,7 +209,17 @@ class AuthorizationLinkTest extends TestCase
 
         $mockList->expects($this->once())
             ->method('getAccessStatus')
-            ->with($identity, $controller, $action)
+            ->with(
+                $this->identicalTo($identity),
+                $this->callback(function ($identifier) use ($controller, $action) {
+                    if (! $identifier instanceof LinkAwareResourceIdentifier) {
+                        return false;
+                    }
+                    return $identifier->getLink() === 'sweet-link'
+                        && $identifier->getController() === $controller
+                        && $identifier->getAction() === $action;
+                })
+            )
             ->willReturn($mockAccessStatus);
 
         if ($expectingException) {
