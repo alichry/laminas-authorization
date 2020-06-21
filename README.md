@@ -1,4 +1,8 @@
-# Laminas Authorization
+# laminas-authorization
+
+[![Build Status](https://travis-ci.org/alichry/laminas-authorization.svg?branch=master)](https://travis-ci.org/alichry/laminas-authorization)
+[![codecov](https://codecov.io/gh/alichry/laminas-authorization/branch/master/graph/badge.svg)](https://codecov.io/gh/alichry/laminas-authorization)
+
 Out of the box, laminas provide an authentication module to authenticate users 
 and save their identities in a session storage. This module aims to provide 
 authorization and transparent redirection of unauthorized users with the 
