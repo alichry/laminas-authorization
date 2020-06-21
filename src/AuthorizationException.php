@@ -33,4 +33,9 @@ class AuthorizationException extends \Exception
     const AR_INVALID_AUTH_RESULT = 1;
     const AR_MISSING_AUTH_LINK = 2;
     const AC_INVALID_OPERATOR = 3;
+    const AC_DUPLICATE_LINK_NAME = 4;
+
+    const ARM_BAD_MODE = 4;
+    const ARM_BAD_RESOURCE_IDENTIFIER = 5;
+    const ARM_UNDEFINED_ANNOTATION = 6;
 }

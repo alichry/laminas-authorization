@@ -61,7 +61,6 @@ class AuthorizationLinkFactory implements FactoryInterface
                 'Expecting options to be set, got null.'
             );
         }
-        $serviceManager = $container->get(ServiceManager::class);
         $name = $options[self::OPTION_NAME] ?? null;
         $authenticationServiceOption = $options[self::OPTION_AUTH_SERVICE] ?? null;
         $accessControlOption = $options[self::OPTION_ACCESS_CONTROL] ?? null;
@@ -98,7 +97,7 @@ class AuthorizationLinkFactory implements FactoryInterface
                 )
             );
         }
-
+        $serviceManager = $container->get(ServiceManager::class);
         if (! is_array($authenticationServiceOption)) {
             $authenticationService = $serviceManager->get(
                 $authenticationServiceOption

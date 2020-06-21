@@ -29,6 +29,7 @@ namespace AliChry\Laminas\Authorization;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
 use Laminas\Authentication\AuthenticationServiceInterface;
+use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\Controller\Plugin\Redirect;
 use Laminas\Mvc\MvcEvent;
@@ -49,7 +50,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @var string|null
      */
-    private $action;
+    private $method;
 
     /**
      * @var Redirect
@@ -86,9 +87,9 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @return string|null
      */
-    public function getAction()
+    public function getMethod()
     {
-        return $this->action;
+        return $this->method;
     }
 
     /**
@@ -126,11 +127,12 @@ class AuthorizationService implements AuthorizationServiceInterface
         $this->redirectPlugin = $controller->plugin('redirect');
         $controllerName = $routeMatch->getParam('controller', null);
         $action = $routeMatch->getParam('action', null);
+        $method = null;
         if (null !== $action) {
-            $action = str_replace('-', '', lcfirst(ucwords($action, '-')));
+            $method = AbstractActionController::getMethodFromAction($action);
         }
         $this->controller = $controllerName;
-        $this->action = $action;
+        $this->method = $method;
         $result = $this->getMvcResult();
         $event->setResult($result);
         return $result;
@@ -138,17 +140,17 @@ class AuthorizationService implements AuthorizationServiceInterface
 
     /**
      * @param null $controller
-     * @param null $action
+     * @param null $method
      * @return AuthorizationResult
      * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized(
         $controller = null,
-        $action = null
+        $method = null
     ): AuthorizationResult
     {
         $controller = $controller ?? $this->controller;
-        $action = $action ?? $this->action;
+        $method = $method ?? $this->method;
         if ($controller === null) {
             throw new AuthorizationException(
                 'Unable to check if identity is authorized, controller not set'
@@ -156,7 +158,7 @@ class AuthorizationService implements AuthorizationServiceInterface
         }
         return $this->authorizationChain->isAuthorized(
             $controller,
-            $action
+            $method
         );
     }
 

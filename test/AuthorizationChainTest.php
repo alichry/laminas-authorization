@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace AliChry\Laminas\Authorization\Test;
 
+use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
@@ -183,19 +184,40 @@ class AuthorizationChainTest extends TestCase
         $chain->addLink(null);
     }
 
+    public function testAddLinkWithDuplicateLinkName()
+    {
+        $linkName = 'link';
+
+        $link1 = $this->createMock(AuthorizationLink::class);
+        $link2 = $this->createMock(AuthorizationLink::class);
+
+        $link1->expects($this->once())
+            ->method('getName')
+            ->willReturn($linkName);
+        $link2->expects($this->once())
+            ->method('getName')
+            ->willReturn($linkName);
+        $chain = new AuthorizationChain();
+        $chain->addLink($link1);
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionCode(AuthorizationException::AC_DUPLICATE_LINK_NAME);
+        $chain->addLink($link2);
+    }
+
     /**
      * @dataProvider isAuthorizedProvider
      * @param $operator
      * @param null|string $controller
-     * @param null|string $action
+     * @param null|string $method
      * @param array|?AuthorizationLink[] $links
      * @param array $expected
      * @throws AuthorizationException
+     * @throws AccessControlException
      */
     public function testIsAuthorized(
         $operator,
         $controller,
-        $action,
+        $method,
         array $links,
         array $expected
     )
@@ -205,7 +227,7 @@ class AuthorizationChainTest extends TestCase
             $this->expectException($expected['exception']);
         }
         $chain = new AuthorizationChain($operator, $links);
-        $result = $chain->isAuthorized($controller, $action);
+        $result = $chain->isAuthorized($controller, $method);
         if (! $expectingException) {
             $this->assertSame(
                 $expected['result'],
@@ -216,6 +238,38 @@ class AuthorizationChainTest extends TestCase
                 $result->isValid()
             );
         }
+    }
+
+    /**
+     * @throws AuthorizationException
+     * @throws AccessControlException
+     */
+    public function testIsAuthorizedWithBadLinkObject()
+    {
+        $chain = new AuthorizationChain(
+            AuthorizationChain::OPERATOR_AND,
+            [
+                new \stdClass()
+            ]
+        );
+        $this->expectException(AuthorizationException::class);
+        $chain->isAuthorized('TestController');
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function testIsEmpty()
+    {
+        $emptyChain = new AuthorizationChain();
+        $this->assertTrue($emptyChain->isEmpty());
+        $nonEmptyChain = new AuthorizationChain(
+            AuthorizationChain::OPERATOR_OR,
+            [
+                $this->createMock(AuthorizationLink::class)
+            ]
+        );
+        $this->assertFalse($nonEmptyChain->isEmpty());
     }
 
     /**
@@ -233,7 +287,7 @@ class AuthorizationChainTest extends TestCase
             null,
             'TestController'
         ];
-        $actions = [
+        $methods = [
             null,
             'getAction'
         ];
@@ -247,12 +301,12 @@ class AuthorizationChainTest extends TestCase
         $data = [];
         foreach ($operators as $operator) {
             foreach ($controllers as $controller) {
-                foreach ($actions as $action) {
+                foreach ($methods as $method) {
                     foreach ($linkCounts as $linkCount) {
                         $datum = [
                             $operator,
                             $controller,
-                            $action
+                            $method
                         ];
                         $links = [];
                         if (null === $linkCount) {
@@ -302,7 +356,7 @@ class AuthorizationChainTest extends TestCase
 
                                 $link->expects($this->once())
                                     ->method('isAuthorized')
-                                    ->with($controller, $action)
+                                    ->with($controller, $method)
                                     ->willReturn($mockAuthResult);
 
                                 switch ($operator) {

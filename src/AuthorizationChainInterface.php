@@ -57,8 +57,8 @@ interface AuthorizationChainInterface
 
     /**
      * @param string $controllerName
-     * @param null|string $action
+     * @param null|string $method
      * @return AuthorizationResult
      */
-    public function isAuthorized(string $controllerName, ?string $action = null): AuthorizationResult;
+    public function isAuthorized(string $controllerName, ?string $method = null): AuthorizationResult;
 }

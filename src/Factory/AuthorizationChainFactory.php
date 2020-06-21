@@ -36,6 +36,7 @@ use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
+use Throwable;
 
 class AuthorizationChainFactory implements FactoryInterface
 {
@@ -98,7 +99,7 @@ class AuthorizationChainFactory implements FactoryInterface
                 );
             }
             return $authorizationChain;
-        } catch (AuthorizationException $e) {
+        } catch (Throwable $e) {
             throw new ServiceNotCreatedException(
                 sprintf(
                     'Unable to create AuthorizationChain, exception thrown '

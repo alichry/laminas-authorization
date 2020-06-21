@@ -28,7 +28,6 @@
 namespace AliChry\Laminas\Authorization\Test;
 
 use AliChry\Laminas\AccessControl\Status;
-use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
 use PHPUnit\Framework\TestCase;
 use AliChry\Laminas\Authorization\AuthorizationResult;
@@ -131,7 +130,6 @@ class AuthorizationResultTest extends TestCase
      * @param null|AuthorizationLink $link
      * @param array $resultMessages
      * @param bool|array $expected
-     * @throws AuthorizationException
      */
     public function testResult(
         $status,
@@ -149,6 +147,9 @@ class AuthorizationResultTest extends TestCase
             $this->expectException(
                 $expected['exception']
             );
+            if (isset($expected['code'])) {
+                $this->expectExceptionCode($expected['code']);
+            }
         } else {
             $accessStatusMock->expects($this->once())
                 ->method('getCode')

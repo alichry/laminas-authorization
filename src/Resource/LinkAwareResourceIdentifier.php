@@ -29,7 +29,7 @@ use AliChry\Laminas\AccessControl\Resource\ResourceIdentifier;
 class LinkAwareResourceIdentifier extends ResourceIdentifier
 {
     /**
-     * @var string
+     * @var null|string
      */
     private $link;
 
@@ -37,12 +37,14 @@ class LinkAwareResourceIdentifier extends ResourceIdentifier
      * LinkAwareResourceIdentifier constructor.
      * @param $link
      * @param $controller
-     * @param null $action
+     * @param string|null $action
      */
     public function __construct($link, $controller, $action = null)
     {
+        if (null !== $link) {
+            $this->setLink($link);
+        }
         parent::__construct($controller, $action);
-        $this->setLink($link);
     }
 
     /**

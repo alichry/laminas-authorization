@@ -62,7 +62,6 @@ class AuthorizationResult
      * @param AuthorizationLink $authLink
      * @param bool $authenticated
      * @param array $messages
-     * @throws AuthorizationException
      */
     public function __construct(
         $accessStatus,
@@ -74,11 +73,9 @@ class AuthorizationResult
         $this->setAccessStatus($accessStatus);
         $this->setAuthLink($authLink);
         $this->setMessages($messages);
-        $this->setCode(
-            self::inferCode(
-                $accessStatus,
-                $authenticated
-            )
+        $this->code = self::inferCode(
+            $accessStatus,
+            $authenticated
         );
     }
 
@@ -96,24 +93,6 @@ class AuthorizationResult
     public function getCode(): int
     {
         return $this->code;
-    }
-
-    /**
-     * @param int $code
-     * @throws AuthorizationException if code is invalid
-     */
-    private function setCode(int $code)
-    {
-        if (! $this->validateCode($code)) {
-            throw new AuthorizationException(
-                sprintf(
-                    'Invalid code %d',
-                    $code
-                ),
-                AuthorizationException::AR_INVALID_AUTH_RESULT
-            );
-        }
-        $this->code = $code;
     }
 
     /**
@@ -194,22 +173,5 @@ class AuthorizationResult
             return self::RESULT_ALLOWED;
         }
         return self::RESULT_REJECTED;
-    }
-
-
-    /**
-     * @param int $code
-     *
-     * @return bool
-     */
-    private static function validateCode($code): bool
-    {
-        switch ($code) {
-            case self::RESULT_REJECTED:
-            case self::RESULT_ALLOWED:
-                return true;
-            default:
-                return false;
-        }
     }
 }

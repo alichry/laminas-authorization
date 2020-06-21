@@ -167,7 +167,7 @@ class AuthorizationLinkTest extends TestCase
      * @dataProvider isAuthorizedProvider
      * @param $identity
      * @param $controller
-     * @param $action
+     * @param $method
      * @param $code
      * @param $expected
      * @throws AuthorizationException|AccessControlException
@@ -175,7 +175,7 @@ class AuthorizationLinkTest extends TestCase
     public function testIsAuthorized(
         $identity,
         $controller,
-        $action,
+        $method,
         $code,
         $expected
     )
@@ -211,13 +211,13 @@ class AuthorizationLinkTest extends TestCase
             ->method('getAccessStatus')
             ->with(
                 $this->identicalTo($identity),
-                $this->callback(function ($identifier) use ($controller, $action) {
+                $this->callback(function ($identifier) use ($controller, $method) {
                     if (! $identifier instanceof LinkAwareResourceIdentifier) {
                         return false;
                     }
                     return $identifier->getLink() === 'sweet-link'
                         && $identifier->getController() === $controller
-                        && $identifier->getAction() === $action;
+                        && $identifier->getMethod() === $method;
                 })
             )
             ->willReturn($mockAccessStatus);
@@ -238,7 +238,7 @@ class AuthorizationLinkTest extends TestCase
             ->method('getCode')
             ->willReturn($code);
 
-        $result = $link->isAuthorized($controller, $action);
+        $result = $link->isAuthorized($controller, $method);
 
         if ($expectingException) {
             return;
@@ -274,7 +274,7 @@ class AuthorizationLinkTest extends TestCase
             null,
             'TestController'
         ];
-        $actions = [
+        $methods = [
             null,
             'getAction'
         ];
@@ -297,12 +297,12 @@ class AuthorizationLinkTest extends TestCase
         $data = [];
         foreach ($identities as $identity) {
             foreach ($controllers as $controller) {
-                foreach ($actions as $action) {
+                foreach ($methods as $method) {
                     foreach ($statusCodes as $code) {
                         $datum = [
                             $identity,
                             $controller,
-                            $action,
+                            $method,
                             $code
                         ];
                         if (! in_array($code, $validStatusCodes)) {

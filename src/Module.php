@@ -56,10 +56,7 @@ class Module implements BootstrapListenerInterface
          * @var Application
          */
         $application = $e->getParam('application');
-        if (
-            ! is_object($application)
-            || ! $application instanceof Application
-        ) {
+        if (! $application instanceof Application) {
             throw new AuthorizationException(
                 sprintf(
                     'Bootstrap error, expecting application to be an instance '

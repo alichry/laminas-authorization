@@ -153,11 +153,11 @@ class AuthorizationLink
 
     /**
      * @param $controller
-     * @param $action
+     * @param $method
      * @return AuthorizationResult
      * @throws AuthorizationException|AccessControlException
      */
-    public function isAuthorized($controller, $action): AuthorizationResult
+    public function isAuthorized($controller, $method): AuthorizationResult
     {
         // TODO: pass/use $this->options in AuthorizationResult
         $accessStatus = $this->accessControlList->getAccessStatus(
@@ -165,7 +165,7 @@ class AuthorizationLink
             new LinkAwareResourceIdentifier(
                 $this->name,
                 $controller,
-                $action
+                $method
             )
         );
         $code = $accessStatus->getCode();

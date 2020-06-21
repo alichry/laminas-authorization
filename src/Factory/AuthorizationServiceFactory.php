@@ -39,6 +39,8 @@ use Laminas\ServiceManager\ServiceManager;
 
 class AuthorizationServiceFactory implements FactoryInterface
 {
+    const CONFIG_AUTHORIZATION = 'authorization';
+
     /**
      * Create an object
      *
@@ -55,7 +57,15 @@ class AuthorizationServiceFactory implements FactoryInterface
     {
         $config = $container->get('config');
         $serviceManager = $container->get(ServiceManager::class);
-        $chainOptions = $config['authorization'] ?? null;
+        $chainOptions = $config[self::CONFIG_AUTHORIZATION] ?? null;
+        if (null === $chainOptions) {
+            throw new ServiceNotCreatedException(
+                sprintf(
+                    'Expecting configuration key "%s" to be set, got unset',
+                    self::CONFIG_AUTHORIZATION
+                )
+            );
+        }
         try {
             return new AuthorizationService(
                 $serviceManager->build(
@@ -63,7 +73,7 @@ class AuthorizationServiceFactory implements FactoryInterface
                     $chainOptions
                 )
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new ServiceNotCreatedException(
                 sprintf(
                     'Unable to create AuthorizationService, exception thrown '

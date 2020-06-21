@@ -28,7 +28,6 @@
 namespace AliChry\Laminas\Authorization\Factory;
 
 use Interop\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
 use Laminas\Authentication\AuthenticationService;
 use Laminas\Authentication\Storage\Session;
 use Laminas\Session\SessionManager;
@@ -52,14 +51,15 @@ class AuthenticationServiceFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      *     creating a service.
-     * @throws ContainerException if any other error occurs
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         if (null === $options) {
-            throw new ServiceNotCreatedException(
-                'Expecting options to be non-null, got null.'
-            );
+            // options can be left null
+            // the session (container) names will default, and
+            // the authentication service accepts null as an adapter
+            // only be set later on or passed during authentication
+            $options = [];
         }
         $sessionManager = $container->get(SessionManager::class);
         $sessionName = $options[self::OPTION_SESSION] ?? null;
@@ -71,7 +71,6 @@ class AuthenticationServiceFactory implements FactoryInterface
             $sessionName,
             $sessionManager
         );
-        // will throw exception if passed argument is null
         $authAdapter = $container->get($authAdapterName);
         return new AuthenticationService($storage, $authAdapter);
     }

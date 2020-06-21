@@ -176,11 +176,6 @@ class AuthorizationServiceTest extends TestCase
                 }
             ));
 
-        $mockController->expects($this->any())
-            ->method('plugin')
-            ->with('redirect')
-            ->willReturn($mockRedirectPlugin);
-
         $mockAuthChainNullActionFailure = $this->createMock(
             AuthorizationChain::class
         );
@@ -199,7 +194,7 @@ class AuthorizationServiceTest extends TestCase
         $mockController->expects($this->any())
             ->method('plugin')
             ->with('redirect')
-            ->willReturn($mockRedirect);
+            ->willReturn($mockRedirectPlugin);
 
         // each MvcEvent will induce 2 call for route match,
         // full match is being used twice so that's 4
@@ -208,7 +203,7 @@ class AuthorizationServiceTest extends TestCase
             ->will($this->returnValueMap(
                 [
                     ['controller', null, 'TestController'],
-                    ['action', null, 'get-cat-action']
+                    ['action', null, 'get-cat']
                 ]
             ));
         // same idea, 4 calls
@@ -327,7 +322,7 @@ class AuthorizationServiceTest extends TestCase
         );
         $this->assertSame(
             'getCatAction',
-            $serviceSuccess->getAction()
+            $serviceSuccess->getMethod()
         );
 
         $this->assertEquals(
@@ -340,7 +335,7 @@ class AuthorizationServiceTest extends TestCase
         );
         $this->assertSame(
             'getCatAction',
-            $serviceFailure->getAction()
+            $serviceFailure->getMethod()
         );
 
         $this->assertSame(
@@ -353,7 +348,7 @@ class AuthorizationServiceTest extends TestCase
         );
         $this->assertSame(
             null,
-            $serviceNullActionSuccess->getAction()
+            $serviceNullActionSuccess->getMethod()
         );
 
         $this->assertEquals(
@@ -366,7 +361,7 @@ class AuthorizationServiceTest extends TestCase
         );
         $this->assertSame(
             null,
-            $serviceNullActionFailure->getAction()
+            $serviceNullActionFailure->getMethod()
         );
 
         $this->expectException(AuthorizationException::class);

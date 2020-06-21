@@ -102,10 +102,22 @@ class AuthorizationChain implements AuthorizationChainInterface
 
     /**
      * @param AuthorizationLink $link
+     * @throws AuthorizationException
      */
     public function addLink(AuthorizationLink $link)
     {
-        $this->links[$link->getName()] = $link;
+        $linkName = $link->getName();
+        if (isset($this->links[$linkName])) {
+            throw new AuthorizationException(
+                sprintf(
+                    'Unable to add link to chain, provided link name "%s"'
+                    . 'already exists in chain',
+                    $linkName
+                ),
+                AuthorizationException::AC_DUPLICATE_LINK_NAME
+            );
+        }
+        $this->links[$linkName] = $link;
     }
 
     /**
@@ -142,11 +154,11 @@ class AuthorizationChain implements AuthorizationChainInterface
 
     /**
      * @param string $controllerName
-     * @param null|string $action
+     * @param null|string $method
      * @return AuthorizationResult
      * @throws AuthorizationException|AccessControlException
      */
-    public function isAuthorized(string $controllerName, ?string $action = null)
+    public function isAuthorized(string $controllerName, ?string $method = null)
     : AuthorizationResult
     {
         $returnResult = null;
@@ -164,7 +176,7 @@ class AuthorizationChain implements AuthorizationChainInterface
                     )
                 );
             }
-            $result = $link->isAuthorized($controllerName, $action);
+            $result = $link->isAuthorized($controllerName, $method);
             switch ($this->operator) {
                 case self::OPERATOR_OR:
                     if (true === $result->isValid()) {
