@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace AliChry\Laminas\Authorization\Factory;
+namespace AliChry\Laminas\Authorization\Controller;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\Authorization\AuthorizationException;
