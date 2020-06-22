@@ -78,7 +78,7 @@ class EigenRestfulController extends AbstractRestfulController
              * @todo Determine requirements for when route match is missing.
              *       Potentially allow pulling directly from request metadata?
              */
-            throw new Exception\DomainException('Missing route matches; unsure how to retrieve action');
+            throw new DomainException('Missing route matches; unsure how to retrieve action');
         }
 
         $request = $e->getRequest();
