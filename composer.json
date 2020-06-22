@@ -28,11 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AliChry\\Laminas\\Authorization\\Test\\": "test/",
-            "LaminasTest\\Mvc\\": "vendor/laminas/laminas-mvc/test/"
-        },
-        "files": [
-            "vendor/laminas/laminas-mvc/test/_autoload.php"
-        ]
+            "AliChry\\Laminas\\Authorization\\Test\\": "test/"
+        }
     }
 }
