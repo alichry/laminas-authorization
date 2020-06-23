@@ -27,6 +27,7 @@ namespace AliChry\Laminas\Authorization\Controller;
 use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationService;
+use Laminas\Mvc\Exception\RuntimeException;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Stdlib\ResponseInterface as Response;
@@ -195,7 +196,7 @@ class EigenRestfulController extends AbstractRestfulController
                         break;
                     }
                     $return = $this->patchList($data);
-                } catch (Exception\RuntimeException $ex) {
+                } catch (RuntimeException $ex) {
                     $response = $e->getResponse();
                     $response->setStatusCode(405);
                     return $response;
@@ -216,8 +217,8 @@ class EigenRestfulController extends AbstractRestfulController
 
                 if ($id !== false) {
                     $action = 'update';
-                    if ($result = $this->__check($action)) {
-                        return $result;
+                    if ($return = $this->__check($action)) {
+                        break;
                     }
                     $return = $this->update($id, $data);
                     break;
