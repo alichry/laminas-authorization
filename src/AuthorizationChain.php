@@ -177,7 +177,7 @@ class AuthorizationChain implements AuthorizationChainInterface
                 );
             }
             $result = $link->isAuthorized($controllerName, $method);
-            switch ($this->operator) {
+            switch ($this->getOperator()) {
                 case self::OPERATOR_OR:
                     if (true === $result->isValid()) {
                         return $result;
@@ -201,7 +201,8 @@ class AuthorizationChain implements AuthorizationChainInterface
                         sprintf(
                             'Invalid binary operator "%s"',
                             (string) $this->operator
-                        )
+                        ),
+                        AuthorizationException::AC_INVALID_OPERATOR
                     );
             }
         }

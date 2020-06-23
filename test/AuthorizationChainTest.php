@@ -34,6 +34,7 @@ use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
 use AliChry\Laminas\Authorization\AuthorizationResult;
 use Laminas\Http\Header\Authorization;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AuthorizationChainTest extends TestCase
@@ -254,6 +255,34 @@ class AuthorizationChainTest extends TestCase
         );
         $this->expectException(AuthorizationException::class);
         $chain->isAuthorized('TestController');
+    }
+
+    public function testIsAuthorizedBadOperator()
+    {
+        $controllerName = 'TestController';
+        $method = 'test';
+        /**
+         * @var $controller MockObject|AuthorizationChain
+         */
+        $controller = $this->getMockBuilder(AuthorizationChain::class)
+            ->setMethods(['getOperator'])
+            ->getMock();
+        $link = $this->createMock(AuthorizationLink::class);
+        $authResult = $this->createMock(AuthorizationResult::class);
+        $link->expects($this->once())
+            ->method('isAuthorized')
+            ->with(
+                $this->identicalTo($controllerName),
+                $this->identicalTo($method)
+            )->willReturn($authResult);
+
+        $controller->addLink($link);
+        $controller->expects($this->once())
+            ->method('getOperator')
+            ->willReturn(null);
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionCode(AuthorizationException::AC_INVALID_OPERATOR);
+        $controller->isAuthorized($controllerName, $method);
     }
 
     /**
