@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": "^7.1",
+        "php": "^7.2",
         "laminas/laminas-authentication": "^2.7",
         "laminas/laminas-servicemanager": "^3.4",
         "alichry/laminas-accesscontrol": "^1.0.0",
