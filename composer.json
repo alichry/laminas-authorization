@@ -18,8 +18,9 @@
         "laminas/laminas-servicemanager": "^3.4",
         "alichry/laminas-accesscontrol": "^1.0.0",
         "laminas/laminas-session": "^2.9",
+        "laminas/laminas-mvc": "3.1.1",
         "doctrine/annotations": "^1.10",
-        "laminas/laminas-mvc": "3.1.1"
+        "doctrine/doctrine-orm-module": "^3.0"
     },
     "autoload": {
         "psr-4": {

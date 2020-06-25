@@ -65,11 +65,17 @@ class AnnotatedResourceManager implements ResourceManagerInterface
      * @throws AccessControlException
      */
     public function __construct(
-        $mode,
-        $policy = Policy::POLICY_REJECT,
+        $mode = null,
+        $policy = null,
         $reader = null
     )
     {
+        if (null === $mode) {
+            $mode = self::MODE_STRICT;
+        }
+        if (null === $policy) {
+            $policy = Policy::POLICY_REJECT;
+        }
         $reader = $reader ?? new AnnotationReader();
         $this->setMode($mode);
         $this->setPolicy($policy);

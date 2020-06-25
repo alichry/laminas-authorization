@@ -719,17 +719,17 @@ class AnnotatedResourceManagerTest extends TestCase
     {
         $expectingException = null;
         $expectingExceptionCode = null;
-        if (null === $mode) {
-            $expectingException = TypeError::class;
-        } else if (
-            AnnotatedResourceManager::MODE_STRICT !== $mode
+        if (
+            null !== $mode
+            && AnnotatedResourceManager::MODE_STRICT !== $mode
             && AnnotatedResourceManager::MODE_CHILL !== $mode
         ) {
             $expectingException = AuthorizationException::class;
             $expectingExceptionCode = AuthorizationException::ARM_BAD_MODE;
-        } else if (null === $policy) {
-            $expectingException = TypeError::class;
-        } else if (! Policy::checkType($policy)) {
+        } else if (
+            null !== $policy
+            && ! Policy::checkType($policy)
+        ) {
             $expectingException = AccessControlException::class;
         } else If (Policy::POLICY_AUTHORIZE === $policy) {
             $expectingException = AuthorizationException::class;
@@ -751,11 +751,11 @@ class AnnotatedResourceManagerTest extends TestCase
             return;
         }
         $this->assertSame(
-            $mode,
+            $mode ?? AnnotatedResourceManager::MODE_STRICT,
             $manager->getMode()
         );
         $this->assertSame(
-            $policy,
+            $policy ?? Policy::POLICY_REJECT,
             $manager->getPolicy()
         );
         if (null === $reader) {

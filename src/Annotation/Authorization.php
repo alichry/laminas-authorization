@@ -29,7 +29,7 @@ use AliChry\Laminas\Authorization\AuthorizationException;
 
 /**
  * Class Authorization
- * @package AliChry\Laminas\AccessControl\Annotation
+ * @package AliChry\Laminas\Authorization\Annotation
  * @Annotation
  * @Target("METHOD")
  */

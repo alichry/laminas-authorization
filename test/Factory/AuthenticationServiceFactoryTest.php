@@ -28,13 +28,11 @@ namespace AliChry\Laminas\Authorization\Test\Factory;
 use Laminas\Authentication\Adapter\AdapterInterface;
 use Laminas\Authentication\AuthenticationService;
 use Laminas\Authentication\Storage\Session;
-use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\Session\SessionManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory as Factory;
 use Interop\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class AuthenticationServiceFactoryTest extends TestCase
 {
