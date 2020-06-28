@@ -25,12 +25,15 @@
  * Time: 14:27
  */
 
+use AliChry\Laminas\AccessControl\Policy\Policy;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\Authorization\AuthorizationLink;
 use AliChry\Laminas\Authorization\AuthorizationService;
+use AliChry\Laminas\Authorization\Factory\AnnotatedResourceManagerFactory;
 use AliChry\Laminas\Authorization\Factory\AuthorizationServiceFactory;
 use AliChry\Laminas\Authorization\Factory\AuthorizationLinkFactory;
 use AliChry\Laminas\Authorization\Factory\AuthorizationChainFactory;
+use AliChry\Laminas\Authorization\Resource\AnnotatedResourceManager;
 
 return [
     'service_manager' => [
@@ -38,6 +41,32 @@ return [
             AuthorizationService::class => AuthorizationServiceFactory::class,
             AuthorizationLink::class => AuthorizationLinkFactory::class,
             AuthorizationChain::class => AuthorizationChainFactory::class,
+            AnnotatedResourceManager::class => AnnotatedResourceManagerFactory::class
+        ]
+    ],
+    'alichry' => [
+        'access_control' => [
+            'resource_manager' => [
+                'annotated' => [
+                    'service' => AnnotatedResourceManager::class,
+                    'options' => [
+                        'mode' => AnnotatedResourceManager::MODE_CHILL,
+                        'policy' => Policy::POLICY_REJECT
+                    ]
+                ]
+            ],
+            'list' => [
+                'identity' => [
+                    'service' => IdentityAccessControlList::class,
+                    'options' => [
+                        'resource_manager' => 'annotated'
+                    ]
+                ]
+            ]
+        ],
+        'authorization' => [
+            'operator' => AuthorizationChain::OPERATOR_AND,
+            'chain' => []
         ]
     ]
 ];
