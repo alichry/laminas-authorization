@@ -113,7 +113,7 @@ class AuthorizationLinkFactoryTest extends TestCase
             [
                 Factory::OPTION_NAME => 'link-name',
                 Factory::OPTION_AUTH_SERVICE => 'Auth',
-                Factory::OPTION_ACCESS_CONTROL => 'ACL'
+                Factory::OPTION_ACCESS_CONTROL_LIST => 'ACL'
             ]
         );
     }
@@ -132,6 +132,7 @@ class AuthorizationLinkFactoryTest extends TestCase
     {
         $linkName = 'link-name';
         $redirectRoute = 'redirect';
+        $aclPrefix = 'alichry.access_control.list.';
 
         $mockAuthService = $this->createMock(AuthenticationService::class);
         $mockACL = $this->createMock(AccessControlListInterface::class);
@@ -155,11 +156,11 @@ class AuthorizationLinkFactoryTest extends TestCase
             $expectedAuthService = $mockAuthServiceCustom;
         }
         if (! is_array($aclOption)) {
-            $getValueMap[] = [$aclOption, $mockACL];
+            $getValueMap[] = [$aclPrefix . $aclOption, $mockACL];
             $expectedACL = $mockACL;
         } else {
             $buildValueMap[] = [
-                $aclOption['service'],
+                $aclPrefix . $aclOption['service'],
                 $aclOption['options'],
                 $mockACLCustom
             ];
@@ -182,7 +183,7 @@ class AuthorizationLinkFactoryTest extends TestCase
             [
                 Factory::OPTION_NAME => $linkName,
                 Factory::OPTION_AUTH_SERVICE => $authServiceOption,
-                Factory::OPTION_ACCESS_CONTROL => $aclOption,
+                Factory::OPTION_ACCESS_CONTROL_LIST => $aclOption,
                 Factory::OPTION_REDIRECT_ROUTE => $redirectRoute
             ]
         );

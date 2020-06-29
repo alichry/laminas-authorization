@@ -27,6 +27,7 @@
 
 namespace AliChry\Laminas\Authorization\Factory;
 
+use AliChry\Laminas\AccessControl\Policy\Policy;
 use AliChry\Laminas\Authorization\AuthorizationLink;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -39,7 +40,7 @@ class AuthorizationLinkFactory implements FactoryInterface
 {
     const OPTION_NAME = 'name';
     const OPTION_AUTH_SERVICE = 'authentication_service';
-    const OPTION_ACCESS_CONTROL = 'access_control';
+    const OPTION_ACCESS_CONTROL_LIST = 'access_control_list';
     const OPTION_REDIRECT_ROUTE = 'redirect_route';
 
     /**
@@ -63,7 +64,7 @@ class AuthorizationLinkFactory implements FactoryInterface
         }
         $name = $options[self::OPTION_NAME] ?? null;
         $authenticationServiceOption = $options[self::OPTION_AUTH_SERVICE] ?? null;
-        $accessControlOption = $options[self::OPTION_ACCESS_CONTROL] ?? null;
+        $aclOption = $options[self::OPTION_ACCESS_CONTROL_LIST] ?? null;
         $redirectRoute = $options[self::OPTION_REDIRECT_ROUTE] ?? null;
         if (null === $name) {
             throw new ServiceNotCreatedException(
@@ -81,11 +82,11 @@ class AuthorizationLinkFactory implements FactoryInterface
                 )
             );
         }
-        if (null === $accessControlOption) {
+        if (null === $aclOption) {
             throw new ServiceNotCreatedException(
                 sprintf(
                     'Expecting key "%s" to be set in options, got undefined.',
-                    self::OPTION_ACCESS_CONTROL
+                    self::OPTION_ACCESS_CONTROL_LIST
                 )
             );
         }
@@ -109,14 +110,19 @@ class AuthorizationLinkFactory implements FactoryInterface
             );
         }
 
-        if (! is_array($accessControlOption)) {
+        $aclPrefix = 'alichry.access_control.list.';
+        if (! is_array($aclOption)) {
             $accessControlList = $serviceManager->get(
-                $accessControlOption
+                $aclPrefix . $aclOption
             );
         } else {
+            $service = $aclOption['service'] ?? null;
+            if ($service) {
+                $service = $aclPrefix . $service;
+            }
             $accessControlList = $serviceManager->build(
-                $accessControlOption['service'] ?? null,
-                $accessControlOption['options'] ?? null
+                $service,
+                $aclOption['options'] ?? null
             );
         }
 

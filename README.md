@@ -40,7 +40,7 @@ check the doctrine project website and
 [`IdentityInterface`](https://github.com/alichry/laminas-accesscontrol/blob/master/src/Identity/IdentityInterface.php).
 The methods to implement are `hasPermission` and `hasRole`, in an ORM environment
 where the associations are already defined, it is easy to implement such methods.
-- This authorization services requires an authentication service, configure
+- The authorization service requires an authentication service, configure
 [`Doctrine\Authentication`](https://github.com/doctrine/DoctrineModule/blob/master/docs/authentication.md)
 to quickly deploy an authentication service based on your identity type.
 - Configure this module by defining a "global" authorization link:
@@ -126,7 +126,7 @@ result.
 
 ## Authorization Chain
 An Authorization Chain is built from one or more Authorization Links which the
-authorized result is aggregated using a specified binary operator (OR/AND).
+authorization result is aggregated using a specified binary operator (OR/AND).
 While most applications generally utilize only one link, this is primarily
 related to the design.  
 
