@@ -1,8 +1,6 @@
 <?php
 
 use AliChry\Laminas\Authorization\Factory\AuthenticationServiceFactory;
-use AliChry\Laminas\AccessControl\ArrayAccessControlList as ACL;
-use AliChry\Laminas\AccessControl\Lists\ArrayListAdapter as LA;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use Laminas\Authentication\AuthenticationService;
 
@@ -47,67 +45,9 @@ return [
                         'adapter' => YourAuthenticationAdapter::class
                     ]
                 ],
-                // similar to authentication_service, if you create your own
-                // ACL factory, and register it of course, you can specify it
-                // like:
-                //'access_control' => ACL::class,
-                // otherwise, you can use provided ACL factory,
-                // ArrayAccessControlListFactory, that accepts the list as
-                // factory options.
-                'access_control' => [
-                    'service' => ACL::class,
-                    'options' => [
-                        'mode' => LA::MODE_STRICT,
-                        // or
-                        //'mode' => LA::MODE_CHILL,
-                        'policy' => ACL::POLICY_REJECT,
-                        // or
-                        //'policy' => ACL::POLICY_AUTENTICATE,
-                        // or
-                        //'policy' => ACL::POLICY_ACCEPT,
-                        'controllers' => [
-                            YourController::class => ACL::ACCESS_ALL,
-                            YourAuthenticatedController::class =>
-                                ACL::ACCESS_AUTHENTICATED_ONLY,
-                            YourRejectedController::class => ACL::ACCESS_REJECT_ALL,
-                            AdminRoleController::class => ACL::role('admin'),
-                            AdminPermController::class => ACL::permission('admin'),
-                            YourMultipleAccessController::class => [
-                                // actions
-                                'public' => ACL::ACCESS_ALL,
-                                'authenticated' => ACL::ACCESS_AUTHENTICATED_ONLY,
-                                'rejectAll' => ACL::ACCESS_REJECT_ALL,
-                                'adminRole' => ACL::role('admin'),
-                                'adminPerm' => ACL::permission('admin-perm'),
-                                'specialPerm' => ACL::permission('special')
-                            ]
-                        ],
-                        'identities' => [
-                            'user1@test.com' => [
-                                'roles' => [
-                                    'admin'
-                                ],
-                                'permissions' => [
-                                    'special-perm'
-                                ]
-                            ],
-                            'user2@test.com' => [
-                                'permissions' => [
-                                    'admin-perm'
-                                ]
-                            ]
-                        ],
-                        'roles' => [
-                            'admin' => [
-                                'admin-perm'
-                            ]
-                        ],
-                        'permissions' => [
-                            'admin-perm',
-                            'special-perm'
-                        ]
-                    ]
-                ],
+                // spefcify the name of access control list to use
+                // configured under alichry.access_control.list
+                'access_control_list' => 'mylist'
             ],
         ],
     ],

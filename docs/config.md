@@ -90,7 +90,7 @@ requires build options, you can provide build options under
 - Build options: `options` -- an array of options that are passed to the factory.
 For our provided AuthenticationServiceFactory options, see the sample
 configuration or inspect the factory
-[AuthenticationServiceFactory](https://github.com/alichry/laminas-authorization/blob/master/src/Factory/AuthenticationServiceFactory.php#L41).
+[AuthenticationServiceFactory](../src/Factory/AuthenticationServiceFactory.php#L41).
 
 Whether you decide to pass build options to the factory or not, the registered
 service name should be retrievable by the service manager. If you're using doctrine
@@ -103,4 +103,5 @@ should mention that feature.
 
 The `access_control_list` option is indicates the ACL to use. Access control lists are defined under `alichry.access_control.list`, see [alichry/laminas-accesscontrol](https://github.com/alichry/laminas-accesscontrol). The value should be the access control list identifier. By default, this module configures an `IdentityAccessControlList` identified by `identity`. If you wish to use an `ArrayAccessControlList`, you can configure your list in `alichry.access_control.list` and use its name as the identifier.  
 
-See sample configuration under `config/`
+See sample configuration files in
+[config/](../config)

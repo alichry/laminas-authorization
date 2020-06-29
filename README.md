@@ -27,8 +27,17 @@ This module is not concerned with authenticating users, rather, its only intent
 is to check the authorization status of the (authenticated) identity. To create
 an authorization link, we require:
 
-- An [`AuthenticationServiceInterface`](https://github.com/laminas/laminas-authentication): You can use [doctrine/doctrine-module](https://github.com/doctrine/DoctrineModule) to configure an authentication service easily.
-- An [`AccessControlListInterface`](https://github.com/alichry/accesscontrol): [alichry/laminas-accesscontrol](https://github.com/alichry/laminas-accesscontrol) provides configurable services. By default, this module configures an [`IdentityAccessControlList`](https://github.com/alichry/laminas-authorization/blob/master/config/module.config.php) instance using [`AnnotatedResourceManager`](https://github.com/alichry/laminas-authorization/blob/master/src/Resource/AnnotatedResourceManager.php) as a dependency alongside passed identities implementing [`IdentityInterface`](https://github.com/alichry/laminas-accesscontrol/blob/master/src/Identity/IdentityInterface.php).
+- An [`AuthenticationServiceInterface`](https://github.com/laminas/laminas-authentication):
+You can use [doctrine/doctrine-module](https://github.com/doctrine/DoctrineModule)
+to configure an authentication service easily.
+- An [`AccessControlListInterface`](https://github.com/alichry/accesscontrol):
+[alichry/laminas-accesscontrol](https://github.com/alichry/laminas-accesscontrol)
+provides configurable services. By default, this module configures an
+[`IdentityAccessControlList`](https://github.com/alichry/laminas-authorization/blob/master/config/module.config.php)
+instance using
+[`AnnotatedResourceManager`](https://github.com/alichry/laminas-authorization/blob/master/src/Resource/AnnotatedResourceManager.php)
+as a dependency alongside passed identities implementing
+[`IdentityInterface`](https://github.com/alichry/laminas-accesscontrol/blob/master/src/Identity/IdentityInterface.php).
 
 ## Quick start
 The fastest path to create a laminas application with authorization support is
@@ -137,17 +146,15 @@ each identity with a user or admin role/permission (or the like...)
 
 ## Redirection of unauthorized users
 This module listens to the MVC Dispatch Event that is triggered once the MVC
-application assigns the target controller and possibility the action too
-(after routing). The listener is called before the target controller since we set
-a higher priority, and we can retrieve the target controller/action and redirect
+application assigns the target controller. The listener is called before the
+target controller since we set a higher priority, and we can retrieve the target
+controller/method and redirect
 the user to a specified route if the identity is not authorized to access the
 controller/action.
+
+## Configuration
+See [config.md](docs/config.md)
 
 ## How to help ?
 It would be nice to star this repository. It would help attract more
 contributors, and makes me happy to receive a star ! :)
-
-## TODO
-- Allow different response behaviors other than simply redirecting the user to
-a different route, possibly dropping a json response
-- Provide authorization plugin for controllers.
