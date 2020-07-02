@@ -81,7 +81,7 @@ The authorization service is now configured, you can define annotations on top o
 your methods to indicate authorization policies.
 
 ## Defining method policy using annotations
-On top of your controller's method, you can define `@Authorization` annotations,
+On top of your controller's method or class docblock, you can define `@Authorization` annotations,
 indicating:
 
 - The target link name.
@@ -90,30 +90,54 @@ indicating:
 specified.
 
 You can define multiple annotations, each with a different link name.
-Additionally, you can omit the link name and it will be treated as the fallback
-when using `MODE_CHILL` option in `AnnotatedResourceManager` 
+Additionally, you can omit the link name and it will be treated as the fallback.  
 
 Example:
 
 ```php
+<?php
 use AliChry\Laminas\Authorization\Annotation\Authorization;
 
+/**
+ * Class-level annotations are treated as a fallback. First method annotations
+ * are consulted, if no relevant method annotations were found then
+ * class-level annotations are utilized.
+ *
+ * Default class policy is to reject unspecified links:
+ * @Authorization(policy="Reject")
+ *
+ * Require valid authentication status for "global" link:
+ * @Authorization(link="global", policy="Authenticate")
+ */
 class ApplicationController
 {
     /**
-     * @Authorization(link="global", policy="Allow")
+     * Allow this resource to be publicly accessible:
+     * @Authorization(policy="Allow")
+     * The above will override class-level annotations, and since the link
+     * property was omitted, it will apply to all links.
      */
-    public function homeAction()
+    public function indexAction()
     {
-        // TODO: implement homeAction
     }
         
     /**
+     * Allow this resource to be accessible by entities granted the "delete"
+     * permission under the "global" link:
      * @Authorization(link="global", policy="Authorize", permission="delete")
      */
     public function deleteAction()
     {
-        // TODO: implement deleteAction
+    }
+
+    /**
+     * No annotations are defined for this method, the class annotations
+     * will be used as a fallback. This method requires the user to be
+     * authenticated for the "global" link or the request is rejected for all
+     * other links.
+     */
+    public function profileAction()
+    {
     }
 }
 ```
