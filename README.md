@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/alichry/laminas-authorization.svg?branch=master)](https://travis-ci.org/alichry/laminas-authorization)
 [![codecov](https://codecov.io/gh/alichry/laminas-authorization/branch/master/graph/badge.svg)](https://codecov.io/gh/alichry/laminas-authorization)
 
-Out of the box, laminas's authentication module provides interfaces and services
+Out of the box, Laminas's authentication module provides interfaces and services
 for authenticating users and saving their identities in a session storage. 
 This module provides an authorization service by transparently redirecting
 unauthorized users accessing a certain resource, with the support of defining
@@ -40,7 +40,7 @@ as a dependency alongside passed identities implementing
 [`IdentityInterface`](https://github.com/alichry/laminas-accesscontrol/blob/master/src/Identity/IdentityInterface.php).
 
 ## Quick start
-The fastest path to create a laminas application with authorization support is
+The fastest path to create a Laminas application with authorization support is
 through Doctrine ORM integration. If you're unfamiliar with Doctrine ORM, please
 check the doctrine project website and
 [doctrine/doctrine-orm-module](https://github.com/doctrine/DoctrineORMModule)
