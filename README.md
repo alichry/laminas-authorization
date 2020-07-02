@@ -145,12 +145,17 @@ and ACL. Alternatively, you may use the same Authentication Serivce and assign
 each identity with a user or admin role/permission (or the like...)
 
 ## Redirection of unauthorized users
-This module listens to the MVC Dispatch Event that is triggered once the MVC
-application assigns the target controller. The listener is called before the
-target controller since we set a higher priority, and we can retrieve the target
-controller/method and redirect
-the user to a specified route if the identity is not authorized to access the
-controller/action.
+We perform authorization during the MVC lifecycle and prior dispatching requests for 
+restful controllers. In Laminas MVC architecture, the target method to call 
+for an action-based controller is retrievable prior dispatch by listening on
+the MVC dispatch event. For restful controllers, however, the target method cannot
+be retrieved prior dispatch. We provide
+[EigenRestfulController](src/Controller/EigenRestfulController.php) as an ad-hoc
+solution. Simply extend your controller from `EigenRestfulController` instead of
+`AbstractRestfulController`.
+
+During authorization, whether on the MVC-level or executed by `EigenRestfulController`,
+we redirect unauthorized requests to a configured route.
 
 ## Configuration
 See [config.md](docs/config.md)

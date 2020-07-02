@@ -203,7 +203,7 @@ class AnnotatedResourceManager implements ResourceManagerInterface
                 break;
             }
             if (null === $annotation->link) {
-                if (null !== $methodLinkMatch) {
+                if (null !== $classLinkMatch) {
                     throw new AuthorizationException(
                         sprintf(
                             'Duplicate authorization annotation for class %s',

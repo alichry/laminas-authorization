@@ -33,6 +33,7 @@ use AliChry\Laminas\Authorization\Annotation\Authorization;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\Resource\AnnotatedResourceManager;
 use AliChry\Laminas\Authorization\Resource\LinkAwareResourceIdentifier;
+use AliChry\Laminas\Authorization\Test\Resource\Asset\BadDummyControllerTestAsset;
 use AliChry\Laminas\Authorization\Test\Resource\Asset\ControllerAsset;
 use AliChry\Laminas\Authorization\Test\Resource\Asset\ControllerTestAsset;
 use AliChry\Laminas\Authorization\Test\Resource\Asset\DummyControllerTestAsset;
@@ -43,6 +44,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use stdClass;
 use TypeError;
+use function array_merge;
 use function foo\func;
 
 class AnnotatedResourceManagerTest extends TestCase
@@ -170,10 +172,22 @@ class AnnotatedResourceManagerTest extends TestCase
         $this->registerMockClassAnnotationCallback($class);
         $this->registerMockMethodAnnotationCallback($method);
         $this->registerMockClassAnnotations(
-            $this->getClassAnnotations($class)
+            // add dummy stdClass instance
+            array_merge(
+                $this->getClassAnnotations($class),
+                [
+                    new stdClass()
+                ]
+            )
         );
         $this->registerMockMethodAnnotations(
-            $this->getMethodAnnotations($class, $method)
+            // add dummy stdClass instance
+            array_merge(
+                $this->getMethodAnnotations($class, $method),
+                [
+                    new stdClass()
+                ]
+            )
         );
     }
 
@@ -571,6 +585,40 @@ class AnnotatedResourceManagerTest extends TestCase
             $expectedResource,
             $this->manager->getResource($identifier)
         );
+    }
+
+    public function testGetResourceDuplicateClassAnnotations()
+    {
+        $class = BadDummyControllerTestAsset::class;
+        $method = 'empty';
+        $link = 'link';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
+        );
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionCode(
+            AuthorizationException::ARM_DUPLICATE_ANNOTATION
+        );
+        $this->manager->getResource($identifier);
+    }
+
+    public function testGetResourceDuplicateMethodAnnotations()
+    {
+        $class = ControllerTestAsset::class;
+        $method = 'bad';
+        $link = 'link';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
+        );
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionCode(
+            AuthorizationException::ARM_DUPLICATE_ANNOTATION
+        );
+        $this->manager->getResource($identifier);
     }
 
     /**
