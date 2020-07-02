@@ -26,12 +26,13 @@ namespace AliChry\Laminas\Authorization\Annotation;
 
 use AliChry\Laminas\AccessControl\Policy\Policy;
 use AliChry\Laminas\Authorization\AuthorizationException;
+use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class Authorization
  * @package AliChry\Laminas\Authorization\Annotation
  * @Annotation
- * @Target("METHOD")
+ * @Target({"CLASS", "METHOD"})
  */
 final class Authorization
 {
@@ -69,7 +70,7 @@ final class Authorization
                 throw new AuthorizationException(
                     sprintf(
                         'Bad policy type: %s',
-                        print_r($this->policy, true)
+                        $this->policy
                     )
                 );
         }

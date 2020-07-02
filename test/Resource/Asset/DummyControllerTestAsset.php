@@ -20,23 +20,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
- * Date: 2019-08-21
- * Time: 10:12
  */
 
-namespace AliChry\Laminas\Authorization;
+namespace AliChry\Laminas\Authorization\Test\Resource\Asset;
 
-class AuthorizationException extends \Exception
+class DummyControllerTestAsset
 {
-    const ANY = 0;
-    const AR_INVALID_AUTH_RESULT = 1;
-    const AR_MISSING_AUTH_LINK = 2;
-    const AC_INVALID_OPERATOR = 3;
-    const AC_DUPLICATE_LINK_NAME = 4;
-
-    const ARM_BAD_MODE = 4;
-    const ARM_BAD_RESOURCE_IDENTIFIER = 5;
-    const ARM_UNDEFINED_ANNOTATION = 6;
-    const ARM_DUPLICATE_ANNOTATION = 7;
+    public function dummy()
+    {
+    }
 }

@@ -30,6 +30,7 @@ namespace AliChry\Laminas\Authorization;
 use Laminas\EventManager\EventInterface;
 use Laminas\ModuleManager\Feature\BootstrapListenerInterface;
 use Laminas\Mvc\Application;
+use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Mvc\Controller\AbstractController;
 
@@ -74,7 +75,7 @@ class Module implements BootstrapListenerInterface
         // Get authorization service instance
         $authorizationService = $serviceManager->get(AuthorizationService::class);
         $sharedEventManager->attach(
-            AbstractController::class,
+            AbstractActionController::class,
             MvcEvent::EVENT_DISPATCH,
             [$authorizationService, 'onDispatch'],
             self::DISPATCH_PRIORITY

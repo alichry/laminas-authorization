@@ -28,26 +28,179 @@ namespace AliChry\Laminas\Authorization\Test\Resource;
 use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\AccessControl\Policy\Policy;
 use AliChry\Laminas\AccessControl\Resource\Resource;
+use AliChry\Laminas\AccessControl\Resource\ResourceIdentifier;
 use AliChry\Laminas\Authorization\Annotation\Authorization;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\Resource\AnnotatedResourceManager;
 use AliChry\Laminas\Authorization\Resource\LinkAwareResourceIdentifier;
+use AliChry\Laminas\Authorization\Test\Resource\Asset\ControllerAsset;
+use AliChry\Laminas\Authorization\Test\Resource\Asset\ControllerTestAsset;
+use AliChry\Laminas\Authorization\Test\Resource\Asset\DummyControllerTestAsset;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use stdClass;
 use TypeError;
-
-class DummyController
-{
-    public function dummyAction()
-    {
-    }
-}
+use function foo\func;
 
 class AnnotatedResourceManagerTest extends TestCase
 {
+    /**
+     * @var AnnotationReader
+     */
+    private $reader;
+
+    /**
+     * @var MockObject|AnnotationReader
+     */
+    private $mockReader;
+
+    /**
+     * @var AnnotatedResourceManager
+     */
+    private $manager;
+
+    /**
+     * Used by mockReader
+     *
+     * @var callable
+     */
+    private $readerGetMethodAnnotations;
+
+    /**
+     * Used by mockReader
+     *
+     * @var callable
+     */
+    private $readerGetClassAnnotations;
+
+    /**
+     * Used by mockReader
+     *
+     * @var array|Authorization[]
+     */
+    private $classAnnotations;
+
+    /**
+     * Used by mockReader
+     *
+     * @var array|Authorization[]
+     */
+    private $methodAnnotations;
+
+    /**
+     * @throws AccessControlException
+     * @throws AuthorizationException
+     */
+    public function setUp()
+    {
+        $this->reader = new AnnotationReader();
+        $this->mockReader = $this->createMock(
+            AnnotationReader::class
+        );
+        $this->manager = new AnnotatedResourceManager(
+            AnnotatedResourceManager::MODE_STRICT,
+            Policy::POLICY_REJECT,
+            $this->reader
+        );
+    }
+
+    protected function registerMockReaderExpectations()
+    {
+        $this->manager->setReader($this->mockReader);
+
+        $classCallback = &$this->readerGetClassAnnotations;
+        $methodCallback = &$this->readerGetMethodAnnotations;
+
+        $classAnnotations = &$this->classAnnotations;
+        $methodAnnotations = &$this->methodAnnotations;
+
+        $this->mockReader->expects($this->once())
+            ->method('getClassAnnotations')
+            ->with($this->callback(function ($r) use (&$classCallback) {
+                return call_user_func($classCallback, $r);
+            }))->willReturnCallback(function () use (&$classAnnotations) {
+                return $classAnnotations;
+            });
+        $this->mockReader->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->with($this->callback(function ($r) use (&$methodCallback) {
+                return call_user_func($methodCallback, $r);
+            }))->willReturnCallback(function () use (&$methodAnnotations) {
+                return $methodAnnotations;
+            });
+    }
+
+    protected function registerMockClassAnnotationCallback(string $classname)
+    {
+        $this->readerGetClassAnnotations =
+            function (\ReflectionClass $rc) use ($classname) {
+                return $rc->getName() === $classname;
+        };
+    }
+
+    protected function registerMockMethodAnnotationCallback(string $method)
+    {
+        $this->readerGetMethodAnnotations =
+            function (\ReflectionMethod $rm) use ($method) {
+                return $rm->getName() === $method;
+        };
+    }
+
+    protected function registerMockClassAnnotations(array $a)
+    {
+        $this->classAnnotations = $a;
+    }
+
+    protected function registerMockMethodAnnotations(array $a)
+    {
+        $this->methodAnnotations = $a;
+    }
+
+    /**
+     * @param $class
+     * @param $method
+     * @throws ReflectionException
+     */
+    protected function registerMockReader($class, $method)
+    {
+        $this->registerMockReaderExpectations();
+        $this->registerMockClassAnnotationCallback($class);
+        $this->registerMockMethodAnnotationCallback($method);
+        $this->registerMockClassAnnotations(
+            $this->getClassAnnotations($class)
+        );
+        $this->registerMockMethodAnnotations(
+            $this->getMethodAnnotations($class, $method)
+        );
+    }
+
+    /**
+     * @param $class
+     * @param $method
+     * @return array
+     * @throws ReflectionException
+     */
+    protected function getMethodAnnotations($class, $method)
+    {
+        $rc = new \ReflectionClass($class);
+        $rm = $rc->getMethod($method);
+        return $this->reader->getMethodAnnotations($rm);
+    }
+
+    /**
+     * @param $class
+     * @return array
+     * @throws ReflectionException
+     */
+    protected function getClassAnnotations($class)
+    {
+        $rc = new \ReflectionClass($class);
+        return $this->reader->getClassAnnotations($rc);
+    }
+
     /**
      * @throws AuthorizationException
      * @throws AccessControlException
@@ -118,14 +271,14 @@ class AnnotatedResourceManagerTest extends TestCase
         $this->assertTrue(
             $manager->getReader() instanceof AnnotationReader
         );
-        $mockReader = $this->createMock(Reader::class);
+        $reader = new AnnotationReader();
         $manager = new AnnotatedResourceManager(
             AnnotatedResourceManager::MODE_STRICT,
             Policy::POLICY_REJECT,
-            $mockReader
+            $reader
         );
         $this->assertSame(
-            $mockReader,
+            $reader,
             $manager->getReader()
         );
     }
@@ -138,78 +291,11 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceWithBadIdentifier($identifier)
     {
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT
-        );
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionCode(
             AuthorizationException::ARM_BAD_RESOURCE_IDENTIFIER
         );
-        $resourceManager->getResource($identifier);
-    }
-
-    /**
-     * @throws AccessControlException
-     * @throws AuthorizationException
-     * @throws ReflectionException
-     */
-    public function testGetResourceAllow()
-    {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $perm = null;
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Allow';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
-        );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
-        );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
-
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
-        $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_ALLOW),
-                $perm
-            ),
-            $resource
-        );
+        $this->manager->getResource($identifier);
     }
 
     /**
@@ -219,52 +305,19 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceDefaultPolicyWithStrictMode()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $notRelatedAuthorization = new Authorization();
-        $notRelatedAuthorization->link = 'other-link';
-        $notRelatedAuthorization->policy = 'Authorize';
-        $notRelatedAuthorization->policy = 'other-perm';
-        $mockReader = $this->createMock(
-            Reader::class
-        );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
-        );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $notRelatedAuthorization
-                ]
-            );
-
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
+        $class = DummyControllerTestAsset::class;
+        $method = 'dummy';
+        $link = 'link'; // not found
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionCode(
             AuthorizationException::ARM_UNDEFINED_ANNOTATION
         );
-        $resourceManager->getResource($mockResourceIdentifier);
+        $this->manager->getResource($identifier);
     }
 
     /**
@@ -274,57 +327,58 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceDefaultPolicyWithChillMode()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $notRelatedAuthorization = new Authorization();
-        $notRelatedAuthorization->link = 'other-link';
-        $notRelatedAuthorization->policy = 'Authorize';
-        $notRelatedAuthorization->permission = 'other-perm';
-        $mockReader = $this->createMock(
-            Reader::class
+        $this->manager->setMode(AnnotatedResourceManager::MODE_CHILL);
+        $class = DummyControllerTestAsset::class;
+        $method = 'dummy';
+        $link = 'link'; // not found, but default policy will be used
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_REJECT)
         );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $notRelatedAuthorization
-                ]
-            );
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_CHILL,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_REJECT)
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+    }
+
+    public function testGetResourceAllow()
+    {
+        $class = ControllerTestAsset::class;
+        $method = 'mix';
+        $link = 'link1';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
+        );
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_ALLOW)
+        );
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
     }
 
@@ -335,123 +389,29 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceReject()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $perm = null;
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Reject';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
+        $class = ControllerTestAsset::class;
+        $method = 'mix';
+        $link = 'link2';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_REJECT)
         );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_REJECT),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
-    }
 
-    /**
-     * @throws AccessControlException
-     * @throws AuthorizationException
-     * @throws ReflectionException
-     */
-    public function testGetResourceRejectWithWildcardLink()
-    {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = null;
-        $perm = null;
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Reject';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
-        );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
-        );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn('dummy-link'); // has to be different than the annotation
+        $this->registerMockReader($class, $method);
 
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
-
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_REJECT),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
     }
 
@@ -462,122 +422,29 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceAuthenticate()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $perm = null;
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Authenticate';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
+        $class = ControllerTestAsset::class;
+        $method = 'mixAuth';
+        $link = 'link2';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_AUTHENTICATE)
         );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_AUTHENTICATE),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
-    }
 
-    /**
-     * @throws AccessControlException
-     * @throws AuthorizationException
-     * @throws ReflectionException
-     */
-    public function testGetResourceAuthenticateWithWildcardLink()
-    {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = null;
-        $perm = null;
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Authenticate';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
-        );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
-        );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn(null); // has to be different than the annotation link
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
+        $this->registerMockReader($class, $method);
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_AUTHENTICATE),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
     }
 
@@ -588,59 +455,30 @@ class AnnotatedResourceManagerTest extends TestCase
      */
     public function testGetResourceAuthorize()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = 'dummy-link';
-        $perm = 'dummy-perm';
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Authorize';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
+        $class = ControllerTestAsset::class;
+        $method = 'mixAuth';
+        $link = 'link1';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_AUTHORIZE),
+            'perm-1'
         );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn($link);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_AUTHORIZE),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
     }
 
@@ -649,61 +487,89 @@ class AnnotatedResourceManagerTest extends TestCase
      * @throws AuthorizationException
      * @throws ReflectionException
      */
-    public function testGetResourceAuthorizeWithWildcardLink()
+    public function testGetResourceMethodDefaultAnnotationFallback()
     {
-        $controller = DummyController::class;
-        $method = 'dummyAction';
-        $link = null;
-        $perm = 'dummy-perm';
-        $authorization = new Authorization();
-        $authorization->link = $link;
-        $authorization->policy = 'Authorize';
-        $authorization->permission = $perm;
-        $mockReader = $this->createMock(
-            Reader::class
+        $class = ControllerTestAsset::class;
+        $method = 'methodFallback';
+        $link = 'link2';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
         );
-        $mockResourceIdentifier = $this->createMock(
-            LinkAwareResourceIdentifier::class
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_ALLOW)
         );
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getLink')
-            ->willReturn(null); // has to be different than the annotation link
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getController')
-            ->willReturn($controller);
-        $mockResourceIdentifier->expects($this->once())
-            ->method('getMethod')
-            ->willReturn($method);
-        $mockReader->expects($this->once())
-            ->method('getMethodAnnotations')
-            ->with($this->callback(function (\ReflectionMethod $rm) use ($method) {
-                $name = $rm->getName();
-                return $name === $method;
-            }))
-            ->willReturn(
-                [
-                    new stdClass(),
-                    null,
-                    $authorization
-                ]
-            );
 
-        $resourceManager = new AnnotatedResourceManager(
-            AnnotatedResourceManager::MODE_STRICT,
-            Policy::POLICY_REJECT,
-            $mockReader
-        );
-        $resource = $resourceManager->getResource($mockResourceIdentifier);
-        $this->assertTrue(
-            $resource instanceof Resource
-        );
         $this->assertEquals(
-            new Resource(
-                $mockResourceIdentifier,
-                new Policy(Policy::POLICY_AUTHORIZE),
-                $perm
-            ),
-            $resource
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+    }
+
+    public function testGetResourceClassFallback()
+    {
+        $class = ControllerTestAsset::class;
+        $method = 'classFallback';
+        $link = 'link2';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
+        );
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_AUTHORIZE),
+            'fallback2'
+        );
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+    }
+
+    public function testGetResourceClassDefaultAnnotationFallback()
+    {
+        $class = ControllerTestAsset::class;
+        $method = 'classFallback';
+        $link = 'link3';
+        $identifier = new LinkAwareResourceIdentifier(
+            $link,
+            $class,
+            $method
+        );
+        $expectedResource = new Resource(
+            $identifier,
+            new Policy(Policy::POLICY_AUTHORIZE),
+            'all'
+        );
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
+        );
+
+        $this->registerMockReader($class, $method);
+
+        $this->assertEquals(
+            $expectedResource,
+            $this->manager->getResource($identifier)
         );
     }
 
@@ -715,7 +581,7 @@ class AnnotatedResourceManagerTest extends TestCase
      * @throws AccessControlException
      * @throws AuthorizationException
      */
-    public function testAll($mode, $policy, $reader)
+    public function testGettersAndSetters($mode, $policy, $reader)
     {
         $expectingException = null;
         $expectingExceptionCode = null;

@@ -37,6 +37,7 @@ use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\Application;
+use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\MvcEvent;
 use Laminas\ServiceManager\ServiceManager;
@@ -168,7 +169,7 @@ class ModuleTest extends TestCase
         $mockSharedEventManager->expects($this->once())
             ->method('attach')
             ->with(
-                $this->identicalTo(AbstractController::class),
+                $this->identicalTo(AbstractActionController::class),
                 $this->identicalTo(MvcEvent::EVENT_DISPATCH),
                 $this->identicalTo([$mockAuthorizationService, 'onDispatch']),
                 Module::DISPATCH_PRIORITY

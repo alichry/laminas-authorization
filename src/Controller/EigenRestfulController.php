@@ -87,14 +87,15 @@ class EigenRestfulController extends AbstractRestfulController
         // Was an "action" requested?
         $action  = $routeMatch->getParam('action', false);
         if ($action) {
-            // * if action was set, the AuthorizationService would have
-            // * checked for authorization.
             // Handle arbitrary methods, ending in Action
             $method = static::getMethodFromAction($action);
             if (! method_exists($this, $method)) {
                 $method = 'notFoundAction';
             }
-            $return = $this->$method();
+            $return = $this->__check($method);
+            if (! $return) {
+                $return = $this->$method();
+            }
             $e->setResult($return);
             return $return;
         }

@@ -190,21 +190,59 @@ class AnnotatedResourceManager implements ResourceManagerInterface
         $reflectionMethod = $reflectionClass->getMethod(
             $method
         );
-        $annotations = $this->reader->getMethodAnnotations($reflectionMethod);
-        $match = null;
-        foreach ($annotations as $annotation) {
+        $classAnnotations = $this->reader->getClassAnnotations($reflectionClass);
+        $methodAnnotations = $this->reader->getMethodAnnotations($reflectionMethod);
+        $classLinkMatch = null;
+        $methodLinkMatch = null;
+        foreach ($classAnnotations as $annotation) {
             if (! $annotation instanceof Authorization) {
                 continue;
             }
             if ($link === $annotation->link) {
-                $match = $annotation;
+                $classLinkMatch = $annotation;
                 break;
             }
             if (null === $annotation->link) {
+                if (null !== $methodLinkMatch) {
+                    throw new AuthorizationException(
+                        sprintf(
+                            'Duplicate authorization annotation for class %s',
+                            $controller
+                        ),
+                        AuthorizationException::ARM_DUPLICATE_ANNOTATION
+                    );
+                }
+                // closest match
+                $classLinkMatch = $annotation;
+            }
+        }
+        foreach ($methodAnnotations as $annotation) {
+            if (! $annotation instanceof Authorization) {
+                continue;
+            }
+            if ($link === $annotation->link) {
+                $methodLinkMatch = $annotation;
+                break;
+            }
+            if (null === $annotation->link) {
+                if (null !== $methodLinkMatch) {
+                    throw new AuthorizationException(
+                        sprintf(
+                            'Duplicate authorization annotation for method %s:%s',
+                            $controller, $method
+                        ),
+                        AuthorizationException::ARM_DUPLICATE_ANNOTATION
+                    );
+                }
                 // keep match as an annotation with no specified link
                 // considered as wildcard (this is closest match)
-                $match = $annotation;
+                $methodLinkMatch = $annotation;
             }
+        }
+        if ($methodLinkMatch) {
+            $match = $methodLinkMatch;
+        } else {
+            $match = $classLinkMatch;
         }
         if (null === $match) {
             // throw exception if strict mode is used
@@ -225,6 +263,7 @@ class AnnotatedResourceManager implements ResourceManagerInterface
                 new Policy($this->policy)
             );
         }
+
         return new Resource(
             $resourceIdentifier,
             new Policy($match->getPolicyType()),
