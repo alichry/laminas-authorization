@@ -20,6 +20,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * Note: the below configuration uses doctrine to create different authentication
+ * services. Currently, doctrine/doctrine-module does not support this. I have
+ * created a PR for this.
+ * @see https://github.com/doctrine/DoctrineModule/pull/702
  */
 
 use AliChry\Laminas\Authorization\AuthorizationChain;
