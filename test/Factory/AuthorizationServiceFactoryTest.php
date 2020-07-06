@@ -86,8 +86,10 @@ class AuthorizationServiceFactoryTest extends TestCase
                         [
                             'config',
                             [
-                                Factory::CONFIG_AUTHORIZATION => [
-                                    'test'
+                                'alichry' => [
+                                    Factory::CONFIG_AUTHORIZATION => [
+                                        'test'
+                                    ]
                                 ]
                             ]
                         ],
@@ -130,8 +132,10 @@ class AuthorizationServiceFactoryTest extends TestCase
                         [
                             'config',
                             [
-                                Factory::CONFIG_AUTHORIZATION => [
-                                    'test'
+                                'alichry' => [
+                                    Factory::CONFIG_AUTHORIZATION => [
+                                        'test'
+                                    ]
                                 ]
                             ]
                         ],

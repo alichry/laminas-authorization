@@ -39,6 +39,7 @@ use Laminas\ServiceManager\ServiceManager;
 
 class AuthorizationServiceFactory implements FactoryInterface
 {
+    const CONFIG_ROOT_KEY = 'alichry';
     const CONFIG_AUTHORIZATION = 'authorization';
 
     /**
@@ -56,6 +57,7 @@ class AuthorizationServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
+        $config = $config[self::CONFIG_ROOT_KEY] ?? [];
         $serviceManager = $container->get(ServiceManager::class);
         $chainOptions = $config[self::CONFIG_AUTHORIZATION] ?? null;
         if (null === $chainOptions) {
