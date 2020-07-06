@@ -25,6 +25,7 @@
  * Time: 14:27
  */
 
+use AliChry\Laminas\AccessControl\IdentityAccessControlList;
 use AliChry\Laminas\AccessControl\Policy\Policy;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\Authorization\AuthorizationLink;
