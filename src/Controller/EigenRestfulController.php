@@ -55,7 +55,7 @@ class EigenRestfulController extends AbstractRestfulController
     {
         return $this->authorizationService->getMvcResult(
             $this->authorizationService->isAuthorized(
-                __CLASS__,
+                get_class($this),
                 $action
             )
         );

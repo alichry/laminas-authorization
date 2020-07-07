@@ -125,7 +125,7 @@ class EigenRestfulControllerTest extends TestCase
         $this->authService->expects($this->once())
             ->method('isAuthorized')
             ->with(
-                $this->identicalTo(EigenRestfulController::class),
+                $this->identicalTo(get_class($this->controller)),
                 $this->identicalTo($targetMethod)
             )->willReturn($authResult);
         $this->authService->expects($this->once())
