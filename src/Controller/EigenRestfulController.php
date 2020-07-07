@@ -38,7 +38,7 @@ class EigenRestfulController extends AbstractRestfulController
     /**
      * @var AuthorizationService
      */
-    private $authorizationService;
+    protected $authorizationService;
 
     public function __construct(AuthorizationService $authService)
     {
@@ -92,6 +92,9 @@ class EigenRestfulController extends AbstractRestfulController
             if (! method_exists($this, $method)) {
                 $method = 'notFoundAction';
             }
+            // * AuthorizationService now checks all controllers that have
+            // * the action param set, so the below is redundant. We'll keep it
+            // * for a bit.
             $return = $this->__check($method);
             if (! $return) {
                 $return = $this->$method();

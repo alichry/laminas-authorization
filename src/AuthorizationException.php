@@ -39,4 +39,8 @@ class AuthorizationException extends \Exception
     const ARM_BAD_RESOURCE_IDENTIFIER = 5;
     const ARM_UNDEFINED_ANNOTATION = 6;
     const ARM_DUPLICATE_ANNOTATION = 7;
+
+    const AS_UNDEFINED_ROUTE_MATCH = 8;
+    const AS_INVALID_TARGET_CONTROLLER = 9;
+    const AS_UNDEFINED_ACTION_PARAM = 10;
 }

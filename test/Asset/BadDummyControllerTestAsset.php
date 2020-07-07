@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace AliChry\Laminas\Authorization\Test\Resource\Asset;
+namespace AliChry\Laminas\Authorization\Test\Asset;
 
 use AliChry\Laminas\Authorization\Annotation\Authorization;
 

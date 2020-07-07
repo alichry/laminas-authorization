@@ -75,7 +75,7 @@ class Module implements BootstrapListenerInterface
         // Get authorization service instance
         $authorizationService = $serviceManager->get(AuthorizationService::class);
         $sharedEventManager->attach(
-            AbstractActionController::class,
+            AbstractController::class,
             MvcEvent::EVENT_DISPATCH,
             [$authorizationService, 'onDispatch'],
             self::DISPATCH_PRIORITY

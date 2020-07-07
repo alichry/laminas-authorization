@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-namespace AliChry\Laminas\Authorization\Test\Resource\Asset;
+namespace AliChry\Laminas\Authorization\Test\Asset;
 
 use AliChry\Laminas\Authorization\Annotation\Authorization;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 /**
  * Class ControllerAsset
@@ -34,7 +35,7 @@ use AliChry\Laminas\Authorization\Annotation\Authorization;
  * @Authorization(link="link2", policy="Authorize", permission="fallback2")
  * @version dummy
  */
-class ControllerTestAsset
+class ControllerTestAsset extends AbstractActionController
 {
     /**
      * @Authorization(policy="Authenticate")
@@ -71,6 +72,18 @@ class ControllerTestAsset
      */
     public function mix()
     {
+    }
+
+    /**
+     * @version dummy
+     * @Authorization(policy="Authenticate")
+     * @Authorization(link="link1", policy="Allow")
+     * @Authorization(link="link2", policy="Reject")
+     * @version dummy
+     */
+    public function mixAction()
+    {
+
     }
 
     /**

@@ -169,7 +169,7 @@ class ModuleTest extends TestCase
         $mockSharedEventManager->expects($this->once())
             ->method('attach')
             ->with(
-                $this->identicalTo(AbstractActionController::class),
+                $this->identicalTo(AbstractController::class),
                 $this->identicalTo(MvcEvent::EVENT_DISPATCH),
                 $this->identicalTo([$mockAuthorizationService, 'onDispatch']),
                 Module::DISPATCH_PRIORITY

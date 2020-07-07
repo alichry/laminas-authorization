@@ -28,6 +28,7 @@
 namespace AliChry\Laminas\Authorization;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
+use AliChry\Laminas\Authorization\Controller\EigenRestfulController;
 use Laminas\Authentication\AuthenticationServiceInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\AbstractController;
@@ -102,35 +103,47 @@ class AuthorizationService implements AuthorizationServiceInterface
         $routeMatch = $event->getRouteMatch();
         if (null === $routeMatch) {
             throw new AuthorizationException(
-                'Retrieved route match is null, unable to infer route params'
+                'Retrieved route match is null, unable to infer route params',
+                AuthorizationException::AS_UNDEFINED_ROUTE_MATCH
             );
         }
-        /**
-         * @var AbstractController
-         */
         $controller = $event->getTarget();
-        $isObject = is_object($controller);
         if (
-            ! $isObject || ! $controller instanceof AbstractController
+            ! $controller instanceof AbstractController
         ) {
             throw new AuthorizationException(
                 sprintf(
                     'Expecting controller (target) to be an instance of %s, '
                     . 'got %s',
                     AbstractController::class,
-                    $isObject
+                    is_object($controller)
                         ? get_class($controller)
                         : gettype($controller)
-                )
+                ),
+                AuthorizationException::AS_INVALID_TARGET_CONTROLLER
             );
         }
         $this->redirectPlugin = $controller->plugin('redirect');
         $controllerName = $routeMatch->getParam('controller', null);
         $action = $routeMatch->getParam('action', null);
-        $method = null;
-        if (null !== $action) {
-            $method = AbstractActionController::getMethodFromAction($action);
+        if (null === $action) {
+            if ($controller instanceof EigenRestfulController) {
+                // We could have listened to action controllers instead,
+                // and not AbstractControllers. We require this to save
+                // the redirect plugin for later usage.
+                return null;
+            }
+            throw new AuthorizationException(
+                sprintf(
+                    'Action parameter is unset in route match. Please define '
+                    . 'default action for route "%s", '
+                    . 'or use EigenRestfulController',
+                    $routeMatch->getMatchedRouteName()
+                ),
+                AuthorizationException::AS_UNDEFINED_ACTION_PARAM
+            );
         }
+        $method = AbstractActionController::getMethodFromAction($action);
         $this->controller = $controllerName;
         $this->method = $method;
         $result = $this->getMvcResult();
