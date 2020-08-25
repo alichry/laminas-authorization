@@ -103,6 +103,14 @@ class ModuleTest extends TestCase
                 $factory
             );
         }
+        $keysConfig = $config['alichry']['build_delegator']['keys'] ?? [];
+        $expectedKeys = [
+            'alichry.authorization.chain'
+        ];
+        $this->assertSame(
+            $expectedKeys,
+            $keysConfig
+        );
     }
 
     public function testOnBootstrapWithBadApplicationObject()

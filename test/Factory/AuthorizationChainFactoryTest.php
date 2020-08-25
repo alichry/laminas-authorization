@@ -146,15 +146,31 @@ class AuthorizationChainFactoryTest extends TestCase
      */
     public function testInvocation($chainOption, $links)
     {
+        /*
+        /* the below is replaced in getReturnValueMap
         $this->mockContainer->expects($this->once())
             ->method('get')
             ->with($this->identicalTo(ServiceManager::class))
             ->willReturn($this->mockServiceManager);
+        */
 
-        $returnValueMap = [];
+        $buildReturnValueMap = [];
+        $getReturnValueMap = [
+            [
+                ServiceManager::class,
+                $this->mockServiceManager
+            ]
+        ];
         foreach ($chainOption as $linkName => $linkOptions) {
-            $returnValueMap[] = [
-                AuthorizationLink::class,
+            if (! is_array($linkOptions)) {
+                $getReturnValueMap[] = [
+                    $linkOptions,
+                    $links[$linkName],
+                ];
+                continue;
+            }
+            $buildReturnValueMap[] = [
+                $linkOptions['service'] ?? AuthorizationLink::class,
                 array_merge(
                     $linkOptions,
                     [
@@ -164,9 +180,14 @@ class AuthorizationChainFactoryTest extends TestCase
                 $links[$linkName]
             ];
         }
-        $this->mockServiceManager->expects($this->exactly(count($returnValueMap)))
+        $this->mockServiceManager
+            ->expects($this->exactly(count($buildReturnValueMap)))
             ->method('build')
-            ->will($this->returnValueMap($returnValueMap));
+            ->will($this->returnValueMap($buildReturnValueMap));
+        $this->mockContainer
+            ->expects($this->exactly(count($getReturnValueMap)))
+            ->method('get')
+            ->will($this->returnValueMap($getReturnValueMap));
 
         $chain = $this->invokeFactory([
             Factory::OPTION_OPERATOR => AuthorizationChain::OPERATOR_OR,
@@ -221,11 +242,10 @@ class AuthorizationChainFactoryTest extends TestCase
             [
                 [
                     'link1' => [
+                        'service' => 'SomeService',
                         'option1' => 'value1'
                     ],
-                    'link2' => [
-                        'option2' => 'value2'
-                    ]
+                    'link2' => 'SomeService'
                 ],
                 [
                     'link1' => $mockLink1,

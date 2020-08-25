@@ -68,6 +68,11 @@ return [
         'authorization' => [
             'operator' => AuthorizationChain::OPERATOR_AND,
             'chain' => []
+        ],
+        'build_delegator' => [
+            'keys' => [
+                'alichry.authorization.chain'
+            ]
         ]
     ]
 ];

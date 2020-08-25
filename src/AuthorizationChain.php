@@ -85,7 +85,7 @@ class AuthorizationChain implements AuthorizationChainInterface
     }
 
     /**
-     * @return array|AuthorizationLink[]
+     * @return array|LinkInterface[]
      */
     public function getLinks(): array
     {
@@ -93,7 +93,7 @@ class AuthorizationChain implements AuthorizationChainInterface
     }
 
     /**
-     * @param array|AuthorizationLink[] $links
+     * @param array|LinkInterface[] $links
      */
     public function setLinks(array $links)
     {
@@ -163,7 +163,7 @@ class AuthorizationChain implements AuthorizationChainInterface
     {
         $returnResult = null;
         foreach ($this->links as $index => $link) {
-            if (! $link instanceof AuthorizationLink) {
+            if (! $link instanceof LinkInterface) {
                 throw new AuthorizationException(
                     sprintf(
                         'Invalid link at index/name %s, must be an instance '
