@@ -33,7 +33,7 @@ use AliChry\Laminas\AccessControl\Status;
 use AliChry\Laminas\Authorization\Resource\LinkAwareResourceIdentifier;
 use Laminas\Authentication\AuthenticationServiceInterface;
 
-class AuthorizationLink
+class AuthorizationLink implements LinkInterface
 {
     /**
      * @var string

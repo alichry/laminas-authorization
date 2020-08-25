@@ -86,16 +86,23 @@ class AuthorizationChainFactory implements FactoryInterface
             $authorizationChain = new AuthorizationChain($operator);
             $serviceManager = $container->get(ServiceManager::class);
             foreach ($chain as $linkName => $linkOptions) {
-                $authorizationChain->addLink(
-                    $serviceManager->build(
-                        AuthorizationLink::class,
+                if (! is_array($linkOptions)) {
+                    $link = $container->get($linkOptions);
+                } else {
+                    $link = $serviceManager->build(
+                        // removing default service name fallback will
+                        // result in BC break in 0.4
+                        $linkOptions['service'] ?? AuthorizationLink::class,
                         array_merge(
                             $linkOptions,
                             [
                                 AuthorizationLinkFactory::OPTION_NAME => $linkName
                             ]
                         )
-                    )
+                    );
+                }
+                $authorizationChain->addLink(
+                    $link
                 );
             }
             return $authorizationChain;
