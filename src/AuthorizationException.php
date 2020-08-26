@@ -30,17 +30,18 @@ namespace AliChry\Laminas\Authorization;
 class AuthorizationException extends \Exception
 {
     const ANY = 0;
-    const AR_INVALID_AUTH_RESULT = 1;
-    const AR_MISSING_AUTH_LINK = 2;
-    const AC_INVALID_OPERATOR = 3;
-    const AC_DUPLICATE_LINK_NAME = 4;
+    const AR_INVALID_CODE = 1;
+    const AR_INVALID_AUTH_RESULT = 2;
+    const AR_MISSING_AUTH_LINK = 3;
+    const AC_INVALID_OPERATOR = 4;
+    const AC_DUPLICATE_LINK_NAME = 5;
 
-    const ARM_BAD_MODE = 4;
-    const ARM_BAD_RESOURCE_IDENTIFIER = 5;
-    const ARM_UNDEFINED_ANNOTATION = 6;
-    const ARM_DUPLICATE_ANNOTATION = 7;
+    const ARM_BAD_MODE = 6;
+    const ARM_BAD_RESOURCE_IDENTIFIER = 7;
+    const ARM_UNDEFINED_ANNOTATION = 8;
+    const ARM_DUPLICATE_ANNOTATION = 9;
 
-    const AS_UNDEFINED_ROUTE_MATCH = 8;
-    const AS_INVALID_TARGET_CONTROLLER = 9;
-    const AS_UNDEFINED_ACTION_PARAM = 10;
+    const AS_UNDEFINED_ROUTE_MATCH = 10;
+    const AS_INVALID_TARGET_CONTROLLER = 11;
+    const AS_UNDEFINED_ACTION_PARAM = 12;
 }

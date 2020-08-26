@@ -29,5 +29,5 @@ namespace AliChry\Laminas\Authorization;
 
 interface AuthorizationServiceInterface
 {
-    public function isAuthorized(): AuthorizationResult;
+    public function isAuthorized(): Result;
 }

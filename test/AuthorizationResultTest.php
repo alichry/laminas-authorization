@@ -29,11 +29,57 @@ namespace AliChry\Laminas\Authorization\Test;
 
 use AliChry\Laminas\AccessControl\Status;
 use AliChry\Laminas\Authorization\AuthorizationLink;
+use AliChry\Laminas\Authorization\LinkInterface;
 use PHPUnit\Framework\TestCase;
-use AliChry\Laminas\Authorization\AuthorizationResult;
+use AliChry\Laminas\Authorization\Result;
 
 class AuthorizationResultTest extends TestCase
 {
+    public function testConstructor()
+    {
+        $link = $this->createMock(LinkInterface::class);
+        $accessStatus = new Status(Status::UNAUTHORIZED, 'test', ['hello']);
+        $rejected = Result::RESULT_REJECTED;
+        $allowed = Result::RESULT_ALLOWED;
+        $messages = ['hi'];
+        $rejectedResult = new Result(
+            $rejected,
+            $link,
+            $accessStatus,
+            $messages
+        );
+        $allowedResult = new Result(
+            $allowed,
+            $link,
+            $accessStatus,
+            $messages
+        );
+        $this->assertSame(
+            $rejected,
+            $rejectedResult->getCode()
+        );
+        $this->assertSame(
+            $link,
+            $rejectedResult->getAuthLink()
+        );
+        $this->assertSame(
+            $messages,
+            $rejectedResult->getMessages()
+        );
+        $this->assertSame(
+            $allowed,
+            $allowedResult->getCode()
+        );
+        $this->assertSame(
+            $link,
+            $allowedResult->getAuthLink()
+        );
+        $this->assertSame(
+            $messages,
+            $allowedResult->getMessages()
+        );
+    }
+
     /**
      * @return array
      */
@@ -63,7 +109,7 @@ class AuthorizationResultTest extends TestCase
         ];
         $allLinks = [
             null,
-            $this->createMock(AuthorizationLink::class)
+            $this->createMock(LinkInterface::class)
         ];
         $someResultMessages = [
             null,
@@ -127,11 +173,11 @@ class AuthorizationResultTest extends TestCase
      * @param int $status
      * @param array $statusMessages
      * @param bool|null $authenticated
-     * @param null|AuthorizationLink $link
+     * @param null|LinkInterface $link
      * @param array $resultMessages
      * @param bool|array $expected
      */
-    public function testResult(
+    public function testCodeFromAccessStatus(
         $status,
         $statusMessages,
         $authenticated,
@@ -156,9 +202,9 @@ class AuthorizationResultTest extends TestCase
                 ->willReturn($status);
         }
 
-        $result = new AuthorizationResult(
-            $accessStatusMock,
+        $result = Result::fromAccessStatus(
             $link,
+            $accessStatusMock,
             $authenticated,
             $resultMessages
         );
@@ -194,8 +240,8 @@ class AuthorizationResultTest extends TestCase
             );
             $this->assertEquals(
                 $expected
-                    ? AuthorizationResult::RESULT_ALLOWED
-                    : AuthorizationResult::RESULT_REJECTED,
+                    ? Result::RESULT_ALLOWED
+                    : Result::RESULT_REJECTED,
                 $result->getCode()
             );
         }

@@ -24,7 +24,7 @@
 
 namespace AliChry\Laminas\Authorization\Test\Controller;
 
-use AliChry\Laminas\Authorization\AuthorizationResult;
+use AliChry\Laminas\Authorization\Result;
 use AliChry\Laminas\Authorization\AuthorizationService;
 use AliChry\Laminas\Authorization\Controller\EigenRestfulController;
 use Laminas\Mvc\Exception\RuntimeException;
@@ -121,7 +121,7 @@ class EigenRestfulControllerTest extends TestCase
     )
     {
         $authMvcResult = new Response();
-        $authResult = $this->createMock(AuthorizationResult::class);
+        $authResult = $this->createMock(Result::class);
         $this->authService->expects($this->once())
             ->method('isAuthorized')
             ->with(

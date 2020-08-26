@@ -29,7 +29,7 @@ namespace AliChry\Laminas\Authorization;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
 
-class AuthorizationChain implements AuthorizationChainInterface
+class AuthorizationChain implements ChainInterface
 {
     // binary operator
     const OPERATOR_AND = 'AND';
@@ -155,11 +155,11 @@ class AuthorizationChain implements AuthorizationChainInterface
     /**
      * @param string $controllerName
      * @param null|string $method
-     * @return AuthorizationResult
+     * @return Result
      * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized(string $controllerName, ?string $method = null)
-    : AuthorizationResult
+    : Result
     {
         $returnResult = null;
         foreach ($this->links as $index => $link) {

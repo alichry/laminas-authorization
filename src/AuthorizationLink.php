@@ -46,7 +46,7 @@ class AuthorizationLink implements LinkInterface
     private $authenticationService;
 
     /**
-     * @var AccessControlListInterface
+     * @var null|AccessControlListInterface
      */
     private $accessControlList;
 
@@ -65,14 +65,18 @@ class AuthorizationLink implements LinkInterface
     public function __construct(
         string $name,
         AuthenticationServiceInterface $authenticationService,
-        AccessControlListInterface $list,
-        ?string $redirectRoute = null
+        AccessControlListInterface $list = null,
+        string $redirectRoute = null
     )
     {
         $this->setName($name);
         $this->setAuthenticationService($authenticationService);
-        $this->setAccessControlList($list);
-        $this->setRedirectRoute($redirectRoute);
+        if (null !== $list) {
+            $this->setAccessControlList($list);
+        }
+        if (null !== $redirectRoute) {
+            $this->setRedirectRoute($redirectRoute);
+        }
     }
 
     /**
@@ -110,9 +114,9 @@ class AuthorizationLink implements LinkInterface
     }
 
     /**
-     * @return AccessControlListInterface
+     * @return null|AccessControlListInterface
      */
-    public function getAccessControlList(): AccessControlListInterface
+    public function getAccessControlList(): ?AccessControlListInterface
     {
         return $this->accessControlList;
     }
@@ -136,30 +140,48 @@ class AuthorizationLink implements LinkInterface
     }
 
     /**
-     * @param null|string $redirectRoute
+     * @param string $redirectRoute
      */
-    public function setRedirectRoute(?string $redirectRoute): void
+    public function setRedirectRoute(string $redirectRoute): void
     {
         $this->redirectRoute = $redirectRoute;
     }
 
     /**
-     * @return bool
+     * @return Result
+     * @throws AuthorizationException
      */
-    public function isAuthenticated(): bool
+    public function isAuthenticated(): Result
     {
-        return $this->authenticationService->hasIdentity();
+        $authenticated = $this->authenticationService->hasIdentity();
+        if ($authenticated) {
+            $code = Result::RESULT_ALLOWED;
+        } else {
+            $code = Result::RESULT_REJECTED;
+        }
+        return new Result(
+            $code,
+            $this
+        );
     }
 
     /**
      * @param $controller
      * @param $method
-     * @return AuthorizationResult
+     * @return Result
      * @throws AuthorizationException|AccessControlException
      */
-    public function isAuthorized($controller, $method): AuthorizationResult
+    public function isAuthorized($controller, $method): Result
     {
-        // TODO: pass/use $this->options in AuthorizationResult
+        if (null === $this->accessControlList) {
+            /**
+             * This allows to span authorization links without an underlying
+             * access control list, essentially spanning authentication links.
+             * If there's no ACL, all authenticated users are authorized.
+             */
+            return $this->isAuthenticated();
+        }
+        // TODO: pass/use $this->options in Result
         $accessStatus = $this->accessControlList->getAccessStatus(
             $this->authenticationService->getIdentity(),
             new LinkAwareResourceIdentifier(
@@ -174,16 +196,16 @@ class AuthorizationLink implements LinkInterface
             case Status::REJECTED:
             case Status::UNAUTHORIZED:
             case Status::UNAUTHENTICATED: // if passed identity is null
-                return new AuthorizationResult(
-                    $accessStatus,
-                    $this
+                return Result::fromAccessStatus(
+                    $this,
+                    $accessStatus
                 );
                 break;
             case Status::OK:
-                $authenticated = $this->isAuthenticated();
-                return new AuthorizationResult(
-                    $accessStatus,
+                $authenticated = $this->authenticationService->hasIdentity();
+                return Result::fromAccessStatus(
                     $this,
+                    $accessStatus,
                     $authenticated
                 );
                 break;

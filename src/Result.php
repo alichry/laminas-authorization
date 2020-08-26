@@ -27,12 +27,12 @@
 
 namespace AliChry\Laminas\Authorization;
 
-use AliChry\Laminas\AccessControl\Status;
+use AliChry\Laminas\AccessControl\Status as AccessStatus;
 
-class AuthorizationResult
+class Result
 {
-    const RESULT_ALLOWED = 0;
-    const RESULT_REJECTED = 1;
+    const RESULT_REJECTED = 0;
+    const RESULT_ALLOWED = 1;
 
     /**
      * @var int
@@ -40,14 +40,16 @@ class AuthorizationResult
     private $code;
 
     /**
-     * @var Status
+     * @var null|AccessStatus
+     * if the result is created using fromAccessStatus()
+     * the passed access status will be stored here.
      */
     private $accessStatus;
 
     /**
-     * @var AuthorizationLink
+     * @var LinkInterface
      * if the result is not OK, this will be
-     * the AuthorizationLink that filtered it
+     * the LinkInterface that filtered it
      */
     private $authLink;
 
@@ -57,26 +59,29 @@ class AuthorizationResult
     private $messages;
 
     /**
-     * AuthorizationResult constructor.
-     * @param Status $accessStatus
-     * @param AuthorizationLink $authLink
-     * @param bool $authenticated
-     * @param array $messages
+     * Result constructor.
+     * @param int $code
+     * @param LinkInterface $authLink
+     * @param AccessStatus|null $status this does not affect the underlying code,
+     *  (result) use fromAccessStatus() to infer code and store it
+     * @param array|null $messages
+     * @throws AuthorizationException
      */
     public function __construct(
-        $accessStatus,
-        $authLink,
-        $authenticated = false,
-        array $messages = []
+        int $code,
+        LinkInterface $authLink,
+        AccessStatus $status = null,
+        array $messages = null
     )
     {
-        $this->setAccessStatus($accessStatus);
+        $this->setCode($code);
         $this->setAuthLink($authLink);
-        $this->setMessages($messages);
-        $this->code = self::inferCode(
-            $accessStatus,
-            $authenticated
-        );
+        if (null !== $status) {
+            $this->setAccessStatus($status);
+        }
+        if (null !== $messages) {
+            $this->setMessages($messages);
+        }
     }
 
     /**
@@ -96,34 +101,48 @@ class AuthorizationResult
     }
 
     /**
-     * @return Status
+     * @param int $code
+     * @throws AuthorizationException
      */
-    public function getAccessStatus(): Status
+    private function setCode(int $code): void
+    {
+        if ($code !== self::RESULT_ALLOWED && $code !== self::RESULT_REJECTED) {
+            throw new AuthorizationException(
+                'Invalid code: ' . $code,
+                AuthorizationException::AR_INVALID_CODE
+            );
+        }
+        $this->code = $code;
+    }
+
+    /**
+     * @return AccessStatus|null
+     */
+    public function getAccessStatus(): ?AccessStatus
     {
         return $this->accessStatus;
     }
 
     /**
-     * @param Status $status
+     * @param AccessStatus $status
      */
-    private function setAccessStatus(Status $status)
+    private function setAccessStatus(AccessStatus $status)
     {
         $this->accessStatus = $status;
     }
 
     /**
-     * @return AuthorizationLink
+     * @return LinkInterface
      */
-    public function getAuthLink(): AuthorizationLink
+    public function getAuthLink(): LinkInterface
     {
         return $this->authLink;
     }
 
     /**
-     * @param AuthorizationLink $authLink
-     * @throws \TypeError if auth link is null
+     * @param LinkInterface $authLink
      */
-    private function setAuthLink(AuthorizationLink $authLink)
+    private function setAuthLink(LinkInterface $authLink)
     {
         $this->authLink = $authLink;
     }
@@ -149,6 +168,9 @@ class AuthorizationResult
      */
     public function getAllMessages(): array
     {
+        if (null === $this->accessStatus) {
+            return $this->getMessages();
+        }
         return array_merge(
             $this->messages,
             $this->accessStatus->getMessages()
@@ -156,22 +178,46 @@ class AuthorizationResult
     }
 
     /**
-     * @param Status $accessStatus
+     * @param AccessStatus $accessStatus
      * @param bool $authenticated
      * @return int
      */
     private static function inferCode(
-        Status $accessStatus,
+        AccessStatus $accessStatus,
         bool $authenticated = false
     ): int
     {
         $statusCode = $accessStatus->getCode();
-        if ($statusCode === Status::PUBLIC) {
+        if ($statusCode === AccessStatus::PUBLIC) {
             return self::RESULT_ALLOWED;
         }
-        if ($statusCode === Status::OK && true === $authenticated) {
+        if ($statusCode === AccessStatus::OK && true === $authenticated) {
             return self::RESULT_ALLOWED;
         }
         return self::RESULT_REJECTED;
+    }
+
+    /**
+     * @param LinkInterface $authLink
+     * @param AccessStatus $accessStatus
+     * @param bool $authenticated
+     * @param array $messages
+     * @return Result
+     * @throws AuthorizationException
+     */
+    public static function fromAccessStatus(
+        LinkInterface $authLink,
+        AccessStatus $accessStatus,
+        bool $authenticated = false,
+        array $messages = []
+    ): self
+    {
+        $code = self::inferCode($accessStatus, $authenticated);
+        return new Result(
+            $code,
+            $authLink,
+            $accessStatus,
+            $messages
+        );
     }
 }
