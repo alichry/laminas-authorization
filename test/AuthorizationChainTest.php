@@ -32,7 +32,7 @@ use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
-use AliChry\Laminas\Authorization\AuthorizationResult;
+use AliChry\Laminas\Authorization\Result;
 use Laminas\Http\Header\Authorization;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -268,7 +268,7 @@ class AuthorizationChainTest extends TestCase
             ->setMethods(['getOperator'])
             ->getMock();
         $link = $this->createMock(AuthorizationLink::class);
-        $authResult = $this->createMock(AuthorizationResult::class);
+        $authResult = $this->createMock(Result::class);
         $link->expects($this->once())
             ->method('isAuthorized')
             ->with(
@@ -377,7 +377,7 @@ class AuthorizationChainTest extends TestCase
                                 $validResult = (bool) ($c & pow(2, $i));
                                 $link = $links[$i];
                                 $mockAuthResult = $this->createMock(
-                                    AuthorizationResult::class
+                                    Result::class
                                 );
                                 $mockAuthResult->expects($this->atLeastOnce())
                                     ->method('isValid')

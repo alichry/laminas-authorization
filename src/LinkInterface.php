@@ -29,7 +29,7 @@ namespace AliChry\Laminas\Authorization;
 
 interface LinkInterface
 {
-    public function isAuthenticated(): bool;
+    public function isAuthenticated(): Result;
 
-    public function isAuthorized($controller, $method): AuthorizationResult;
+    public function isAuthorized($controller, $method): Result;
 }

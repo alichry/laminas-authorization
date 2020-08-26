@@ -155,11 +155,11 @@ class AuthorizationChain implements ChainInterface
     /**
      * @param string $controllerName
      * @param null|string $method
-     * @return AuthorizationResult
+     * @return Result
      * @throws AuthorizationException|AccessControlException
      */
     public function isAuthorized(string $controllerName, ?string $method = null)
-    : AuthorizationResult
+    : Result
     {
         $returnResult = null;
         foreach ($this->links as $index => $link) {

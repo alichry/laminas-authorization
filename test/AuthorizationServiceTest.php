@@ -33,7 +33,7 @@ use AliChry\Laminas\AccessControl\Lists\ArrayListAdapter;
 use AliChry\Laminas\Authorization\AuthorizationChain;
 use AliChry\Laminas\Authorization\AuthorizationException;
 use AliChry\Laminas\Authorization\AuthorizationLink;
-use AliChry\Laminas\Authorization\AuthorizationResult;
+use AliChry\Laminas\Authorization\Result;
 use AliChry\Laminas\Authorization\AuthorizationService;
 use AliChry\Laminas\Authorization\Controller\EigenRestfulController;
 use AliChry\Laminas\Authorization\Resource\AnnotatedResourceManager;
@@ -402,8 +402,8 @@ class AuthorizationServiceTest extends TestCase
 
     public function testMockIsAuthorized()
     {
-        $mockResultSuccess = $this->createMock(AuthorizationResult::class);
-        $mockResultFailed = $this->createMock(AuthorizationResult::class);
+        $mockResultSuccess = $this->createMock(Result::class);
+        $mockResultFailed = $this->createMock(Result::class);
 
         $mockChainSuccess = $this->createMock(AuthorizationChain::class);
         $mockChainFailure = $this->createMock(AuthorizationChain::class);
@@ -491,8 +491,8 @@ class AuthorizationServiceTest extends TestCase
             AuthorizationChain::class
         );
         $mockAuthLink = $this->createMock(AuthorizationLink::class);
-        $mockAuthResultFailed = $this->createMock(AuthorizationResult::class);
-        $mockAuthResultSuccess = $this->createMock(AuthorizationResult::class);
+        $mockAuthResultFailed = $this->createMock(Result::class);
+        $mockAuthResultSuccess = $this->createMock(Result::class);
 
         // any number of calls since the same object is being used multiple
         // times

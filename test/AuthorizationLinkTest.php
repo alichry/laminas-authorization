@@ -145,9 +145,14 @@ class AuthorizationLinkTest extends TestCase
             $this->mockAccessControlList()
         );
 
+        $result = $link->isAuthenticated();
         $this->assertSame(
             true,
-            $link->isAuthenticated()
+            $result->isValid()
+        );
+        $this->assertSame(
+            $link,
+            $result->getAuthLink()
         );
 
         $serviceMock2 = $this->mockAuthService();
@@ -157,9 +162,14 @@ class AuthorizationLinkTest extends TestCase
 
         $link->setAuthenticationService($serviceMock2);
 
+        $result = $link->isAuthenticated();
         $this->assertSame(
             false,
-            $link->isAuthenticated()
+            $result->isValid()
+        );
+        $this->assertSame(
+            $link,
+            $result->getAuthLink()
         );
     }
 
@@ -230,7 +240,7 @@ class AuthorizationLinkTest extends TestCase
             $getCodeGonnaBeCalled = $this->once();
         } else {
             // otherwise, it is called twice. Once in isAuthorized and once
-            // in AuthorizationResult
+            // in Result
             $getCodeGonnaBeCalled = $this->exactly(2);
         }
 

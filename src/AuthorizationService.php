@@ -152,13 +152,13 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @param null $controller
      * @param null $method
-     * @return AuthorizationResult
+     * @return Result
      * @throws AuthorizationException
      */
     public function isAuthorized(
         $controller = null,
         $method = null
-    ): AuthorizationResult
+    ): Result
     {
         $controller = $controller ?? $this->controller;
         $method = $method ?? $this->method;
@@ -174,12 +174,12 @@ class AuthorizationService implements AuthorizationServiceInterface
     }
 
     /**
-     * @param null|AuthorizationResult $authResult
+     * @param null|Result $authResult
      * @return null|ResponseInterface
      * @throws AuthorizationException
      */
     public function getMvcResult(
-        AuthorizationResult $authResult = null
+        Result $authResult = null
     ): ?ResponseInterface
     {
         if (null === $authResult) {
