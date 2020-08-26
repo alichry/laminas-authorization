@@ -169,10 +169,11 @@ class AuthorizationChainFactoryTest extends TestCase
                 ];
                 continue;
             }
+            $options = $linkOptions['options'] ?? $linkOptions;
             $buildReturnValueMap[] = [
                 $linkOptions['service'] ?? AuthorizationLink::class,
                 array_merge(
-                    $linkOptions,
+                    $options,
                     [
                         AuthorizationLinkFactory::OPTION_NAME => $linkName
                     ]
@@ -243,7 +244,9 @@ class AuthorizationChainFactoryTest extends TestCase
                 [
                     'link1' => [
                         'service' => 'SomeService',
-                        'option1' => 'value1'
+                        'options' => [
+                            'one' => '1'
+                        ]
                     ],
                     'link2' => 'SomeService'
                 ],

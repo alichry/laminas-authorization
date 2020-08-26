@@ -89,12 +89,17 @@ class AuthorizationChainFactory implements FactoryInterface
                 if (! is_array($linkOptions)) {
                     $link = $container->get($linkOptions);
                 } else {
+                    // removing default service name fallback will
+                    // result in BC break in 0.4
+                    $options = $linkOptions;
+                    if (isset($options['options'])) {
+                        $options = $options['options'];
+                    }
                     $link = $serviceManager->build(
-                        // removing default service name fallback will
-                        // result in BC break in 0.4
+
                         $linkOptions['service'] ?? AuthorizationLink::class,
                         array_merge(
-                            $linkOptions,
+                            $options,
                             [
                                 AuthorizationLinkFactory::OPTION_NAME => $linkName
                             ]

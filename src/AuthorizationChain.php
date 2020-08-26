@@ -29,7 +29,7 @@ namespace AliChry\Laminas\Authorization;
 
 use AliChry\Laminas\AccessControl\AccessControlException;
 
-class AuthorizationChain implements AuthorizationChainInterface
+class AuthorizationChain implements ChainInterface
 {
     // binary operator
     const OPERATOR_AND = 'AND';

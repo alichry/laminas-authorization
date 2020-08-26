@@ -27,9 +27,7 @@
 
 namespace AliChry\Laminas\Authorization;
 
-use AliChry\Laminas\AccessControl\AccessControlException;
 use AliChry\Laminas\Authorization\Controller\EigenRestfulController;
-use Laminas\Authentication\AuthenticationServiceInterface;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Controller\AbstractController;
 use Laminas\Mvc\Controller\Plugin\Redirect;
@@ -39,7 +37,7 @@ use Laminas\Stdlib\ResponseInterface;
 class AuthorizationService implements AuthorizationServiceInterface
 {
     /**
-     * @var AuthenticationServiceInterface
+     * @var ChainInterface
      */
     private $authorizationChain;
 
@@ -60,19 +58,19 @@ class AuthorizationService implements AuthorizationServiceInterface
 
     /**
      * AccessFilter constructor.
-     * @param AuthorizationChain $authorizationChain
+     * @param ChainInterface $authorizationChain
      */
     public function __construct(
-        AuthorizationChain $authorizationChain
+        ChainInterface $authorizationChain
     )
     {
         $this->authorizationChain = $authorizationChain;
     }
 
     /**
-     * @return AuthorizationChain
+     * @return ChainInterface
      */
-    public function getAuthorizationChain(): AuthorizationChain
+    public function getAuthorizationChain(): ChainInterface
     {
         return $this->authorizationChain;
     }
@@ -96,7 +94,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @param MvcEvent $event
      * @return null|ResponseInterface
-     * @throws AuthorizationException|AccessControlException
+     * @throws AuthorizationException
      */
     public function onDispatch(MvcEvent $event): ?ResponseInterface
     {
@@ -155,7 +153,7 @@ class AuthorizationService implements AuthorizationServiceInterface
      * @param null $controller
      * @param null $method
      * @return AuthorizationResult
-     * @throws AuthorizationException|AccessControlException
+     * @throws AuthorizationException
      */
     public function isAuthorized(
         $controller = null,
@@ -178,7 +176,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     /**
      * @param null|AuthorizationResult $authResult
      * @return null|ResponseInterface
-     * @throws AuthorizationException|AccessControlException
+     * @throws AuthorizationException
      */
     public function getMvcResult(
         AuthorizationResult $authResult = null

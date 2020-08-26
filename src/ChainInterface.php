@@ -27,7 +27,7 @@
 
 namespace AliChry\Laminas\Authorization;
 
-interface AuthorizationChainInterface
+interface ChainInterface
 {
     /**
      * @return mixed
