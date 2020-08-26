@@ -101,10 +101,10 @@ class AuthorizationChain implements AuthorizationChainInterface
     }
 
     /**
-     * @param AuthorizationLink $link
+     * @param LinkInterface $link
      * @throws AuthorizationException
      */
-    public function addLink(AuthorizationLink $link)
+    public function addLink(LinkInterface $link)
     {
         $linkName = $link->getName();
         if (isset($this->links[$linkName])) {
@@ -130,10 +130,10 @@ class AuthorizationChain implements AuthorizationChainInterface
 
     /**
      * @param string|int $index
-     * @return AuthorizationLink
+     * @return LinkInterface
      * @throws AuthorizationException
      */
-    public function getLink($index): AuthorizationLink
+    public function getLink($index): LinkInterface
     {
         if (is_int($index)) {
             $keys = \array_keys($this->links);

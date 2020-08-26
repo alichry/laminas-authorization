@@ -35,25 +35,25 @@ interface AuthorizationChainInterface
     public function getOperator();
 
     /**
-     * @param AuthorizationLink $link
+     * @param LinkInterface $link
      */
-    public function addLink(AuthorizationLink $link);
+    public function addLink(LinkInterface $link);
 
     /**
-     * @param array|AuthorizationLink[] $chain
+     * @param array|LinkInterface[] $chain
      */
     public function setLinks(array $chain);
 
     /**
-     * @return array|AuthenticationLink[]
+     * @return array|LinkInterface[]
      */
     public function getLinks(): array;
 
     /**
      * @param string|int $index
-     * @return AuthorizationLink
+     * @return LinkInterface
      */
-    public function getLink($index): AuthorizationLink;
+    public function getLink($index): LinkInterface;
 
     /**
      * @param string $controllerName
