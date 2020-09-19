@@ -81,14 +81,6 @@ class AuthorizationLinkFactory implements FactoryInterface
                 )
             );
         }
-        if (null === $aclOption) {
-            throw new ServiceNotCreatedException(
-                sprintf(
-                    'Expecting key "%s" to be set in options, got undefined.',
-                    self::OPTION_ACCESS_CONTROL_LIST
-                )
-            );
-        }
         if (null === $redirectRoute) {
             throw new ServiceNotCreatedException(
                 sprintf(
@@ -110,7 +102,9 @@ class AuthorizationLinkFactory implements FactoryInterface
         }
 
         $aclPrefix = 'alichry.access_control.list.';
-        if (! is_array($aclOption)) {
+        if ($aclOption === null) {
+            $accessControlList = null;
+        } else if (! is_array($aclOption)) {
             $accessControlList = $serviceManager->get(
                 $aclPrefix . $aclOption
             );
